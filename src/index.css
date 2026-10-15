@@ -70,7 +70,7 @@ button { background: none; border: 0; cursor: none; }
 /* Glass that catches starlight: a hairline gold border that brightens toward the top-left */
 .glass {
   position: relative;
-  background: linear-gradient(160deg, rgba(22, 26, 56, 0.55), rgba(8, 10, 24, 0.5));
+  background: linear-gradient(160deg, rgba(20, 24, 52, 0.74), rgba(7, 9, 22, 0.7));
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   border-radius: var(--radius);

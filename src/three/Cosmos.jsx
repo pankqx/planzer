@@ -39,14 +39,17 @@ function CameraRig() {
       t.dirIn.copy(t.p).setY(0).normalize().negate()
       t.fwd.copy(t.dirIn).negate()
       t.right.crossVectors(t.fwd, UP).normalize()
-      const dist = narrow ? 4.6 : 3.4
-      pos.copy(t.p).addScaledVector(t.dirIn, dist).addScaledVector(UP, narrow ? 1.6 : 1.0)
+      const ps = planetAnchors[month].userData.size || 0.3
+      const k = 0.55 + ps * 3.2
+      const dist = (narrow ? 6.2 : 4.6) * k
+      pos.copy(t.p).addScaledVector(t.dirIn, dist).addScaledVector(UP, (narrow ? 2.2 : 1.5) * k)
       tgt.copy(t.p)
-      if (narrow) tgt.addScaledVector(UP, -1.0)
-      else tgt.addScaledVector(t.right, -1.45)
+      if (narrow) tgt.addScaledVector(UP, -1.35 * k)
+      else tgt.addScaledVector(t.right, -1.75 * k * Math.min(1, aspect / 1.6))
     } else if (view === 'habits') {
-      pos.set(0, narrow ? 46 : 34, 0.01)
-      tgt.set(0, 0, 0)
+      // turn away from the orrery toward open sky, so the rituals read clean
+      pos.set(-3, 6, 30)
+      tgt.set(-14, 16, -40)
     } else if (view === 'print') {
       pos.set(0, 40, 70)
       tgt.set(0, 0, 0)

@@ -345,7 +345,7 @@ function Planet({ m, angle, radius, stats, current, hovered, selected, dim, focu
         <lineBasicMaterial ref={orbitMat} color={current ? '#fff2cc' : '#e6c98a'} transparent opacity={0} depthWrite={false} />
       </line>
       <group ref={anchor} position={pos}>
-        <AnchorRegister m={m} anchor={anchor} />
+        <AnchorRegister m={m} anchor={anchor} size={size} />
         <mesh ref={body}>
           <sphereGeometry args={[size, 64, 48]} />
           <shaderMaterial
@@ -412,7 +412,7 @@ function Planet({ m, angle, radius, stats, current, hovered, selected, dim, focu
             <meshBasicMaterial ref={ringMat} color={[2.4, 1.9, 1.1]} toneMapped={false} transparent opacity={0} depthWrite={false} />
           </mesh>
         </Billboard>
-        {current && <CurrentHalo size={size} />}
+        {current && !selected && <CurrentHalo size={size} />}
         {moons.map((g, i) => (
           <Moon key={g.id} i={i} planetSize={size} color={catOf(g.category).color} focused={focus?.id === g.id} faded={focus && focus.id !== g.id} progress={goalProgress(g)} />
         ))}
@@ -426,10 +426,11 @@ function Planet({ m, angle, radius, stats, current, hovered, selected, dim, focu
   )
 }
 
-function AnchorRegister({ m, anchor }) {
+function AnchorRegister({ m, anchor, size }) {
   // register after mount so the camera rig can track this planet
   useFrame(() => {
     planetAnchors[m] = anchor.current
+    if (anchor.current) anchor.current.userData.size = size
   })
   return null
 }
@@ -465,7 +466,7 @@ function Moon({ i, planetSize, color, focused, faded, progress }) {
     const s = damp(ref.current.scale.x, focused ? 2.2 : faded ? 0.5 : 1, 6, dt)
     ref.current.scale.setScalar(s)
   })
-  const c = new THREE.Color(color).multiplyScalar(1.4 + progress * 1.6)
+  const c = new THREE.Color(color).multiplyScalar(0.9 + progress * 1.1)
   return (
     <mesh ref={ref}>
       <sphereGeometry args={[0.045, 16, 16]} />
