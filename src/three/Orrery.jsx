@@ -205,6 +205,7 @@ function Dial({ geo, year, current, today }) {
       else if (d < -0.12) l.userData.flip = Math.PI
       l.rotation.z = l.userData.base + (l.userData.flip || 0)
     })
+    const o = sig.orrery
     mats.current.forEach((m) => m && (m.opacity = m.userData.base * o))
     if (bead.current) {
       const k = (state.clock.elapsedTime * 0.12) % 1
