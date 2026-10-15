@@ -422,10 +422,12 @@ const PRINT_CSS = `
   html, body, #root { height: auto !important; overflow: visible !important; background: none !important; }
   body { cursor: auto; }
   .cosmos, canvas, .hdr, .dock, .grain, .vignette, .cur-dot, .cur-ring, .pv-bar { display: none !important; }
+  .pv, .pv * { opacity: 1 !important; }
   .pv { position: static !important; background: none !important; }
   .pv-scroll { overflow: visible !important; padding: 0 !important; perspective: none; }
   .pv-stack { gap: 0 !important; zoom: 1 !important; }
-  .page { box-shadow: none !important; transform: none !important; opacity: 1 !important; break-after: page; page-break-after: always; }
+  .page { box-shadow: none !important; transform: none !important; contain: strict; break-after: page; page-break-after: always; }
+  .cover-ring circle, .cover-ring line { opacity: .7 !important; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .cover-owner input:placeholder-shown { visibility: hidden; }
 }
