@@ -156,6 +156,7 @@ export function Dock() {
   const view = useStore((s) => s.view)
   const go = useStore((s) => s.go)
   return (
+    <div className="dock-wrap">
     <motion.nav
       className="dock glass"
       initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
@@ -163,14 +164,15 @@ export function Dock() {
       transition={{ duration: 1.3, ease, delay: 1.3 }}
     >
       <style>{`
-        .dock { position: fixed; z-index: 30; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; gap: 4px; padding: 6px; border-radius: 999px; }
+        .dock-wrap { position: fixed; z-index: 30; left: 0; right: 0; bottom: 24px; display: flex; justify-content: center; pointer-events: none; }
+        .dock { pointer-events: auto; display: flex; gap: 4px; padding: 6px; border-radius: 999px; }
         .dock button { position: relative; isolation: isolate; display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 999px; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--mute); transition: color .4s; }
         .dock button:hover { color: var(--ivory); }
         .dock button.on { color: #1a1206; }
         .dock .pill { position: absolute; inset: 0; border-radius: 999px; background: linear-gradient(180deg, #f5e2b3, #c99d55); box-shadow: 0 0 30px -4px rgba(230,201,138,.7); z-index: -1; }
         .dock i { font-style: normal; font-size: 13px; }
-        @media (max-width: 640px) { .dock { bottom: 12px; } .dock button { padding: 11px 13px; } .dock .lbl { display: none; } .dock i { font-size: 15px; } }
-        @media print { .dock { display: none; } }
+        @media (max-width: 640px) { .dock-wrap { bottom: 12px; } .dock button { padding: 11px 13px; } .dock .lbl { display: none; } .dock i { font-size: 15px; } }
+        @media print { .dock-wrap { display: none; } }
       `}</style>
       {TABS.map(([id, label, glyph]) => (
         <button key={id} className={view === id ? 'on' : ''} onClick={() => go(id)}>
@@ -180,5 +182,6 @@ export function Dock() {
         </button>
       ))}
     </motion.nav>
+    </div>
   )
 }

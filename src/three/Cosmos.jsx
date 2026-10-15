@@ -1,6 +1,7 @@
-import { Suspense, useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { EffectComposer, Bloom, ToneMapping } from '@react-three/postprocessing'
+import { PerformanceMonitor } from '@react-three/drei'
 import { ToneMappingMode } from 'postprocessing'
 import * as THREE from 'three'
 import { Starfield, Nebula, ShootingStars } from './Sky'
@@ -131,15 +132,18 @@ function Drag() {
 }
 
 export default function Cosmos() {
+  // start crisp, step down resolution on slower GPUs so motion always stays fluid
+  const [dpr, setDpr] = useState(Math.min(window.devicePixelRatio, 1.75))
   return (
     <Canvas
       className="cosmos"
-      dpr={[1, 1.75]}
+      dpr={dpr}
       gl={{ antialias: false, powerPreference: 'high-performance', alpha: false }}
       camera={{ fov: 40, near: 0.1, far: 1000, position: [0, 0.6, 18] }}
       style={{ position: 'fixed', inset: 0, zIndex: 0 }}
       onCreated={({ gl }) => gl.setClearColor('#03040a')}
     >
+      <PerformanceMonitor onDecline={() => setDpr((d) => Math.max(0.75, d - 0.35))} onIncline={() => setDpr((d) => Math.min(Math.min(window.devicePixelRatio, 1.75), d + 0.25))} flipflops={3} />
       <Suspense fallback={null}>
         <Nebula />
         <Starfield />

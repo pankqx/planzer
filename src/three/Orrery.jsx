@@ -197,13 +197,14 @@ function Dial({ geo, year, current, today }) {
     labels.current.forEach((l) => {
       if (!l) return
       l.getWorldPosition(wp)
-      const far = wp.z < -1.2
-      const near = wp.z > 1.2
-      if (far) l.userData.flip = 0
-      else if (near) l.userData.flip = Math.PI
+      // the engraving's "up" points outward from the sun; flip it when that faces the viewer
+      const dx = wp.x - state.camera.position.x
+      const dz = wp.z - state.camera.position.z
+      const d = (wp.x * dx + wp.z * dz) / (Math.hypot(wp.x, wp.z) * Math.hypot(dx, dz) || 1)
+      if (d > 0.12) l.userData.flip = 0
+      else if (d < -0.12) l.userData.flip = Math.PI
       l.rotation.z = l.userData.base + (l.userData.flip || 0)
     })
-    const o = sig.orrery
     mats.current.forEach((m) => m && (m.opacity = m.userData.base * o))
     if (bead.current) {
       const k = (state.clock.elapsedTime * 0.12) % 1

@@ -89,14 +89,14 @@ export default function Intro() {
         .in-corner { position: absolute; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--faint); line-height: 1.9; }
         .in-corner b { color: var(--gold); font-weight: 500; }
         .in-skip { position: absolute; right: 28px; bottom: 26px; }
-        @media (max-width: 640px) { .in-stack { top: 58%; } .in-corner.br, .in-corner.bl { display: none; } }
+        @media (max-width: 640px) { .in-stack { top: 58%; } .in-corner.tr, .in-corner.bl { display: none; } }
       `}</style>
       <div className="in-seed" />
       <div className="in-corner in-fade" style={{ left: 28, top: 26 }}>
         <b>Planzer</b> · Edition {toRoman(year)}
         <br />N° 001 — The Celestial Planner
       </div>
-      <div className="in-corner in-fade" style={{ right: 28, top: 26, textAlign: 'right' }}>
+      <div className="in-corner in-fade tr" style={{ right: 28, top: 26, textAlign: 'right' }}>
         12 worlds · {new Date(year, 1, 29).getDate() === 29 ? 366 : 365} days
         <br />1 year to chart
       </div>

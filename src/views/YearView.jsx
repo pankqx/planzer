@@ -41,7 +41,7 @@ export default function YearView() {
         .ledger .list { flex: 1; margin: 18px -8px 0; padding: 0 8px; }
         @media (max-width: 1100px) { .yv-hero { top: 90px; } .yv-num { font-size: 64px; } .yv-stats { display: none; } }
         @media (max-width: 860px) {
-          .yv-hero { left: 18px; top: 74px; } .yv-num { font-size: 46px; } .yv-sub { font-size: 16px; } .yv-hint { display: none; }
+          .yv-hero { left: 18px; top: 74px; } .yv-num { font-size: 46px; } .yv-sub { display: none; } .yv-hint { display: none; }
           .ledger { left: 10px; right: 10px; width: auto; top: auto; bottom: 78px; height: 44vh; }
         }
       `}</style>
