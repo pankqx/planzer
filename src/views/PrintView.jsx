@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useStore, monthStats, catOf, goalProgress } from '../store'
 import { MONTHS, MONTHS_SHORT, WEEKDAYS, ROMAN, monthGrid, dateKey, monthKey, daysIn, toRoman } from '../lib/date'
-import Mark from '../ui/Mark'
-import { ease } from '../ui/bits'
+import { LOOP } from '../ui/Logo'
+
+const ease = [0.22, 1, 0.36, 1]
 
 const THEMES = {
   ivory: { bg: '#f7f1e3', paper2: '#efe6d1', ink: '#1c1a2c', soft: 'rgba(28,26,44,.55)', faint: 'rgba(28,26,44,.16)', gold: '#a7803c', gold2: '#c9a35e' },
@@ -17,6 +18,7 @@ export default function PrintView() {
   const habits = useStore((s) => s.habits)
   const notes = useStore((s) => s.notes)
   const setNote = useStore((s) => s.setNote)
+  const setSheet = useStore((s) => s.setSheet)
   const [theme, setTheme] = useState('ivory')
   const [months, setMonths] = useState(() => new Set(MONTHS.map((_, i) => i)))
   const [zoom, setZoom] = useState(1)
@@ -40,7 +42,7 @@ export default function PrintView() {
   return (
     <motion.div className="pv" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }} style={{ '--p-bg': th.bg, '--p-bg2': th.paper2, '--p-ink': th.ink, '--p-soft': th.soft, '--p-faint': th.faint, '--p-gold': th.gold, '--p-gold2': th.gold2 }}>
       <style>{PRINT_CSS}</style>
-      <div className="pv-bar glass">
+      <div className="pv-bar">
         <div>
           <div className="eyebrow">Print studio</div>
           <div style={{ fontFamily: 'var(--display)', fontSize: 22, letterSpacing: '.06em', marginTop: 2 }}>Your {year} planner, on paper</div>
@@ -60,8 +62,11 @@ export default function PrintView() {
               </button>
             ))}
           </div>
-          <button className="btn solid small" onClick={() => print()}>
-            ❏ Print / Save PDF
+          <button className="btn primary small" onClick={() => print()}>
+            ⎙ Print / Save PDF
+          </button>
+          <button className="btn small" onClick={() => setSheet(null)}>
+            Close
           </button>
         </div>
       </div>
@@ -133,11 +138,14 @@ function Cover({ year, owner, setOwner, th, goals }) {
         </svg>
       </div>
       <div className="cover-mid">
-        <Mark size={150} stroke={th.gold} glow={false} />
+        <svg viewBox="0 0 100 60" width="180" height="108" aria-hidden>
+          <path d={LOOP} fill="none" stroke={th.gold} strokeWidth="3.2" strokeLinejoin="round" />
+          <circle cx="88" cy="30" r="4" fill={th.gold} />
+        </svg>
         <div className="cover-word">PLANZER</div>
         <div className="cover-rule" />
         <div className="cover-year">{toRoman(year)}</div>
-        <div className="cover-sub">The Celestial Year Planner · {year}</div>
+        <div className="cover-sub">The Endless Year Planner · {year}</div>
       </div>
       <div className="cover-owner">
         <div className="cap">Kept by</div>
@@ -335,8 +343,8 @@ function Fragment({ h, year, m, n }) {
 }
 
 const PRINT_CSS = `
-.pv { position: fixed; inset: 0; z-index: 25; display: flex; flex-direction: column; background: radial-gradient(120% 90% at 50% 0%, rgba(3,4,10,.2), rgba(3,4,10,.75)); }
-.pv-bar { margin: 88px auto 0; width: min(1100px, calc(100% - 24px)); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-radius: 22px; }
+.pv { position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; background: radial-gradient(120% 90% at 50% 0%, rgba(3,4,10,.2), rgba(3,4,10,.75)); }
+.pv-bar { margin: 18px auto 0; width: min(1100px, calc(100% - 24px)); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-radius: 22px; }
 .pv-ctrls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .pv-seg { display: flex; padding: 3px; border-radius: 999px; border: 1px solid var(--line); }
 .pv-seg button { padding: 7px 14px; border-radius: 999px; font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--mute); transition: all .4s; }
@@ -421,7 +429,7 @@ const PRINT_CSS = `
   @page { size: A4; margin: 0; }
   html, body, #root { height: auto !important; overflow: visible !important; background: none !important; }
   body { cursor: auto; }
-  .cosmos, canvas, .hdr, .dock, .grain, .vignette, .cur-dot, .cur-ring, .pv-bar { display: none !important; }
+  #root > *:not(.pv), .pv-bar { display: none !important; }
   .pv, .pv * { opacity: 1 !important; }
   .pv { position: static !important; background: none !important; }
   .pv-scroll { overflow: visible !important; padding: 0 !important; perspective: none; }

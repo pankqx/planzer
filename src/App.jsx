@@ -1,61 +1,75 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { useStore } from './store'
-import Cosmos from './three/Cosmos'
-import Intro from './ui/Intro'
-import Cursor from './ui/Cursor'
-import { Header, Dock } from './ui/Chrome'
-import Modals from './ui/GoalModal'
-import YearView from './views/YearView'
+import { live, nav } from './lib/nav'
+import { absOf } from './lib/theme'
+import { todayParts } from './lib/date'
+import NeonIntro from './intro/NeonIntro'
+import PaperIntro from './intro/PaperIntro'
+import MonthLevel from './ribbon/MonthLevel'
+import YearLevel from './ribbon/YearLevel'
+import { TopBar, Scrubber, SideArrows, Hint, AddButton } from './ui/Chrome'
+import Sheets from './ui/Sheets'
 
-const MonthView = lazy(() => import('./views/MonthView'))
-const HabitsView = lazy(() => import('./views/HabitsView'))
+const NeonStage = lazy(() => import('./neon/NeonStage'))
 const PrintView = lazy(() => import('./views/PrintView'))
 
 export default function App() {
+  const theme = useStore((s) => s.theme)
   const phase = useStore((s) => s.phase)
-  const view = useStore((s) => s.view)
-  const go = useStore((s) => s.go)
-  const month = useStore((s) => s.month)
-  const openMonth = useStore((s) => s.openMonth)
-  const modal = useStore((s) => s.modal)
+  const level = useStore((s) => s.level)
+  const sheet = useStore((s) => s.sheet)
+  const goTo = useStore((s) => s.goTo)
 
-  // Keyboard: Esc returns to the year, ←/→ walk through months.
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'neon' ? '#050506' : '#f4ede0')
+  }, [theme])
+
   useEffect(() => {
     const onKey = (e) => {
-      if (phase !== 'app' || modal || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return
-      if (e.key === 'Escape' && view !== 'year') go('year')
-      if (view === 'month' && e.key === 'ArrowRight') openMonth((month + 1) % 12)
-      if (view === 'month' && e.key === 'ArrowLeft') openMonth((month + 11) % 12)
+      if (phase !== 'app' || sheet || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return
+      const r = nav.ribbon
+      if (e.key === 'ArrowRight') (e.shiftKey ? r?.stepMonth(1) : r?.step(1), e.preventDefault())
+      if (e.key === 'ArrowLeft') (e.shiftKey ? r?.stepMonth(-1) : r?.step(-1), e.preventDefault())
+      const k = e.key.toLowerCase()
+      if (k === 't') {
+        const t = todayParts()
+        goTo('month', absOf(t.y, t.m), t.d)
+      }
+      if (k === 'y' && level !== 'year') goTo('year', Math.floor(live.center))
+      if (k === 'm' && level !== 'month') goTo('month', Math.floor(live.center))
     }
     addEventListener('keydown', onKey)
     return () => removeEventListener('keydown', onKey)
-  }, [phase, view, month, modal, go, openMonth])
+  }, [phase, sheet, level, goTo])
 
   return (
     <>
-      <Cosmos />
-      <div className="vignette" />
-      <AnimatePresence>{phase === 'intro' && <Intro key="intro" />}</AnimatePresence>
-      {phase === 'app' && (
-        <>
-          <Header />
-          <Suspense fallback={null}>
-            <AnimatePresence mode="wait">
-              <motion.div key={view} exit={{ opacity: 1, transition: { duration: 0.5 } }}>
-                {view === 'year' && <YearView />}
-                {view === 'month' && <MonthView />}
-                {view === 'habits' && <HabitsView />}
-                {view === 'print' && <PrintView />}
-              </motion.div>
-            </AnimatePresence>
-          </Suspense>
-          <Dock />
-          <Modals />
-        </>
+      {theme === 'neon' && (
+        <Suspense fallback={null}>
+          <NeonStage />
+        </Suspense>
       )}
-      <div className="grain" />
-      <Cursor />
+      {theme === 'paper' && <div className="paper-bg" aria-hidden />}
+      <AnimatePresence>{phase === 'intro' && (theme === 'neon' ? <NeonIntro key="ni" /> : <PaperIntro key="pi" />)}</AnimatePresence>
+      {phase === 'app' && (
+        <main className="app">
+          <AnimatePresence mode="wait">{level === 'year' ? <YearLevel key="year" /> : <MonthLevel key="month" />}</AnimatePresence>
+          <TopBar />
+          <SideArrows />
+          <Scrubber />
+          <AddButton />
+          <Hint />
+          <Sheets />
+        </main>
+      )}
+      {sheet?.type === 'print' && (
+        <Suspense fallback={null}>
+          <PrintView />
+        </Suspense>
+      )}
+      <div className="grain" aria-hidden />
     </>
   )
 }

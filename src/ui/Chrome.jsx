@@ -1,187 +1,199 @@
 import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store'
-import { MONTHS, todayParts, toRoman } from '../lib/date'
-import Mark from './Mark'
-import Magnetic from './Magnetic'
-import { sig } from '../three/signals'
+import { live, nav } from '../lib/nav'
+import { MONTHS, todayParts } from '../lib/date'
+import { absOf, mod12, yearOf } from '../lib/theme'
+import Logo from './Logo'
 
-const ease = [0.22, 1, 0.36, 1]
-
-export function Header() {
-  const year = useStore((s) => s.year)
-  const setYear = useStore((s) => s.setYear)
+export function TopBar() {
+  const level = useStore((s) => s.level)
+  const goTo = useStore((s) => s.goTo)
+  const setSheet = useStore((s) => s.setSheet)
   const setPhase = useStore((s) => s.setPhase)
-  const go = useStore((s) => s.go)
   const t = todayParts()
-  const replay = () => {
-    go('year')
-    sig.orrery = 0
-    sessionStorage.removeItem('planzer-seen')
-    setPhase('intro')
-  }
+  const here = () => Math.floor(live.center)
   return (
-    <motion.header
-      className="hdr"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.2, ease, delay: 0.9 }}
-    >
-      <style>{`
-        .hdr { position: fixed; z-index: 30; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 22px 30px; pointer-events: none; }
-        .hdr > * { pointer-events: auto; }
-        .brand { display: flex; align-items: center; gap: 12px; color: var(--gold); }
-        .brand .name { font-family: var(--display); font-size: 19px; letter-spacing: .38em; color: var(--ivory); }
-        .brand:hover svg { animation: spinmark 2.4s var(--ease); }
-        @keyframes spinmark { to { transform: rotate(360deg); } }
-        .yr { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 999px; }
-        .yr button { width: 30px; height: 30px; border-radius: 50%; color: var(--gold); transition: background .4s; }
-        .yr button:hover { background: rgba(230,201,138,.12); }
-        .yr span { font-family: var(--display); font-size: 17px; letter-spacing: .25em; min-width: 74px; text-align: center; }
-        .hdr-r { display: flex; align-items: center; gap: 14px; }
-        .today { text-align: right; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--faint); line-height: 1.7; }
-        .today b { display: block; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 17px; letter-spacing: .02em; text-transform: none; color: var(--ivory); }
-        @media (max-width: 760px) { .hdr { padding: 14px 14px; } .brand .name { display: none; } .today { display: none; } }
-      `}</style>
-      <button className="brand" onClick={replay} data-cursor="Replay">
-        <Mark size={30} />
-        <span className="name">PLANZER</span>
-      </button>
-      <div className="yr glass">
-        <button onClick={() => setYear(year - 1)} aria-label="Previous year">‹</button>
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span key={year} initial={{ opacity: 0, y: 10, filter: 'blur(6px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, y: -10, filter: 'blur(6px)' }} transition={{ duration: 0.6, ease }} title={toRoman(year)}>
-            {year}
-          </motion.span>
-        </AnimatePresence>
-        <button onClick={() => setYear(year + 1)} aria-label="Next year">›</button>
+    <motion.header className="topbar" initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+      <Logo onClick={() => setPhase('intro')} />
+      <div className="switch" role="tablist" aria-label="Zoom">
+        {[
+          ['year', 'Year'],
+          ['month', 'Month'],
+        ].map(([id, label]) => (
+          <button key={id} role="tab" aria-selected={level === id} className={level === id ? 'on' : ''} onClick={() => level !== id && goTo(id, here(), null)}>
+            {level === id && <motion.i layoutId="sw" className="sw-pill" transition={{ type: 'spring', stiffness: 420, damping: 34 }} />}
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
-      <div className="hdr-r">
-        <div className="today">
-          Today
-          <b>
-            {new Date().toLocaleDateString('en-US', { weekday: 'long' })}, {t.d} {MONTHS[t.m]}
-          </b>
-        </div>
-        <Menu />
+      <div className="tb-right">
+        <button className="btn today" onClick={() => goTo('month', absOf(t.y, t.m), t.d)}>
+          <span className="tdot" /> Today
+        </button>
+        <ThemeToggle />
+        <button className="btn icon" onClick={() => setSheet({ type: 'menu' })} aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+          <span className="lbl">Menu</span>
+        </button>
       </div>
     </motion.header>
   )
 }
 
-function Menu() {
-  const [open, setOpen] = useState(false)
-  const exportData = useStore((s) => s.exportData)
-  const importData = useStore((s) => s.importData)
-  const loadSample = useStore((s) => s.loadSample)
-  const clearYear = useStore((s) => s.clearYear)
-  const year = useStore((s) => s.year)
-  const file = useRef()
-  const box = useRef()
-  useEffect(() => {
-    const close = (e) => box.current && !box.current.contains(e.target) && setOpen(false)
-    addEventListener('pointerdown', close)
-    return () => removeEventListener('pointerdown', close)
-  }, [])
-  const doExport = () => {
-    const blob = new Blob([JSON.stringify(exportData(), null, 2)], { type: 'application/json' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `planzer-${year}-backup.json`
-    a.click()
-    URL.revokeObjectURL(a.href)
-    setOpen(false)
+/** Flips between the neon and paper worlds with a circular reveal from the button. */
+export function ThemeToggle() {
+  const theme = useStore((s) => s.theme)
+  const setTheme = useStore((s) => s.setTheme)
+  const flip = (e) => {
+    const next = theme === 'neon' ? 'paper' : 'neon'
+    const r = e.currentTarget.getBoundingClientRect()
+    const x = r.left + r.width / 2
+    const y = r.top + r.height / 2
+    if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) return setTheme(next)
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
+    const vt = document.startViewTransition(() => flushSync(() => setTheme(next)))
+    vt.ready.then(() =>
+      document.documentElement.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] }, { duration: 950, easing: 'cubic-bezier(.7,0,.2,1)', pseudoElement: '::view-transition-new(root)' }),
+    )
   }
-  const doImport = async (e) => {
-    const f = e.target.files?.[0]
-    if (!f) return
-    try {
-      importData(JSON.parse(await f.text()))
-    } catch (err) {
-      alert(err.message || 'Could not read that file.')
-    }
-    e.target.value = ''
-    setOpen(false)
-  }
-  const items = [
-    ['Export backup', 'Download every goal, plan and habit as JSON', doExport],
-    ['Import backup', 'Restore from a Planzer JSON file', () => file.current.click()],
-    ['Load sample year', `Fill ${year} with an example sky to explore`, () => (loadSample(), setOpen(false))],
-    ['Clear this year', `Remove ${year}'s goals and plans`, () => confirm(`Clear all goals and plans for ${year}? Habits are kept.`) && (clearYear(), setOpen(false))],
-  ]
   return (
-    <div ref={box} style={{ position: 'relative' }}>
-      <Magnetic>
-        <button className="glass" onClick={() => setOpen(!open)} aria-label="Menu" style={{ width: 44, height: 44, borderRadius: '50%', display: 'grid', placeItems: 'center', color: 'var(--gold)' }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <circle cx="8" cy="3" r="1.4" />
-            <circle cx="8" cy="8" r="1.4" />
-            <circle cx="8" cy="13" r="1.4" />
-          </svg>
-        </button>
-      </Magnetic>
-      <input ref={file} type="file" accept="application/json" hidden onChange={doImport} />
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="glass"
-            initial={{ opacity: 0, y: -8, scale: 0.96, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -8, scale: 0.96, filter: 'blur(6px)' }}
-            transition={{ duration: 0.45, ease }}
-            style={{ position: 'absolute', right: 0, top: 54, width: 290, padding: 8, transformOrigin: 'top right', zIndex: 50 }}
-          >
-            {items.map(([t, d, fn]) => (
-              <button key={t} onClick={fn} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '12px 14px', borderRadius: 14 }} className="menu-item">
-                <div style={{ fontSize: 13, color: 'var(--ivory)' }}>{t}</div>
-                <div style={{ fontSize: 11, color: 'var(--faint)', marginTop: 3 }}>{d}</div>
-              </button>
+    <button className={`btn icon theme-toggle ${theme}`} onClick={flip} aria-label={theme === 'neon' ? 'Switch to paper (light) theme' : 'Switch to neon (dark) theme'}>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden>
+        {theme === 'neon' ? (
+          <g>
+            <circle cx="12" cy="12" r="4.5" />
+            {Array.from({ length: 8 }, (_, i) => (
+              <path key={i} d="M12 2.5v2.5" transform={`rotate(${i * 45} 12 12)`} />
             ))}
-            <style>{`.menu-item { transition: background .3s } .menu-item:hover { background: rgba(230,201,138,.08) }`}</style>
-          </motion.div>
+          </g>
+        ) : (
+          <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
         )}
+      </svg>
+      <span className="lbl">{theme === 'neon' ? 'Light' : 'Dark'}</span>
+    </button>
+  )
+}
+
+/** The twelve-month strip along the bottom: always shows where you are; tap to jump. */
+export function Scrubber() {
+  const [year, setYear] = useState(() => yearOf(Math.floor(live.center)) || todayParts().y)
+  const ind = useRef()
+  const yearRef = useRef(year)
+  useEffect(() => {
+    let raf
+    const loop = () => {
+      const k = Math.floor(live.center)
+      const y = yearOf(k)
+      if (y !== yearRef.current && Number.isFinite(y)) {
+        yearRef.current = y
+        setYear(y)
+      }
+      const pos = mod12(k) + (live.center - k)
+      if (ind.current) ind.current.style.transform = `translateX(${(pos * 100).toFixed(2)}%)`
+      raf = requestAnimationFrame(loop)
+    }
+    loop()
+    return () => cancelAnimationFrame(raf)
+  }, [])
+  const go = (abs) => nav.ribbon?.goToMonth(abs)
+  const t = todayParts()
+  return (
+    <div className="scrub-wrap">
+    <motion.nav className="scrub" aria-label="Months" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}>
+      <button className="scrub-y" onClick={() => go(absOf(year - 1, 0))} aria-label="Previous year">
+        ‹
+      </button>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span key={year} className="scrub-year" initial={{ y: 14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -14, opacity: 0 }}>
+          {year}
+        </motion.span>
       </AnimatePresence>
+      <div className="scrub-track">
+        <i className="scrub-ind" ref={ind} />
+        {MONTHS.map((name, i) => (
+          <button key={i} className={`scrub-m ${year === t.y && i === t.m ? 'cur' : ''}`} onClick={() => go(absOf(year, i))} aria-label={`${name} ${year}`}>
+            <span className="full">{name.slice(0, 3)}</span>
+            <span className="short">{name[0]}</span>
+          </button>
+        ))}
+      </div>
+      <button className="scrub-y" onClick={() => go(absOf(year + 1, 0))} aria-label="Next year">
+        ›
+      </button>
+    </motion.nav>
     </div>
   )
 }
 
-const TABS = [
-  ['year', 'Year', '◎'],
-  ['month', 'Month', '◐'],
-  ['habits', 'Habits', '✦'],
-  ['print', 'Print', '❏'],
-]
-
-export function Dock() {
-  const view = useStore((s) => s.view)
-  const go = useStore((s) => s.go)
+export function SideArrows() {
   return (
-    <div className="dock-wrap">
-    <motion.nav
-      className="dock glass"
-      initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={{ duration: 1.3, ease, delay: 1.3 }}
-    >
-      <style>{`
-        .dock-wrap { position: fixed; z-index: 30; left: 0; right: 0; bottom: 24px; display: flex; justify-content: center; pointer-events: none; }
-        .dock { pointer-events: auto; display: flex; gap: 4px; padding: 6px; border-radius: 999px; }
-        .dock button { position: relative; isolation: isolate; display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 999px; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--mute); transition: color .4s; }
-        .dock button:hover { color: var(--ivory); }
-        .dock button.on { color: #1a1206; }
-        .dock .pill { position: absolute; inset: 0; border-radius: 999px; background: linear-gradient(180deg, #f5e2b3, #c99d55); box-shadow: 0 0 30px -4px rgba(230,201,138,.7); z-index: -1; }
-        .dock i { font-style: normal; font-size: 13px; }
-        @media (max-width: 640px) { .dock-wrap { bottom: 12px; } .dock button { padding: 11px 13px; } .dock .lbl { display: none; } .dock i { font-size: 15px; } }
-        @media print { .dock-wrap { display: none; } }
-      `}</style>
-      {TABS.map(([id, label, glyph]) => (
-        <button key={id} className={view === id ? 'on' : ''} onClick={() => go(id)}>
-          {view === id && <motion.span layoutId="pill" className="pill" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />}
-          <i>{glyph}</i>
-          <span className="lbl">{label}</span>
-        </button>
-      ))}
-    </motion.nav>
-    </div>
+    <>
+      <button className="side-arrow left" onClick={() => nav.ribbon?.step(-1)} aria-label="Back">
+        <svg viewBox="0 0 24 24" width="26" height="26">
+          <path d="M15 5l-7 7 7 7" />
+        </svg>
+      </button>
+      <button className="side-arrow right" onClick={() => nav.ribbon?.step(1)} aria-label="Forward">
+        <svg viewBox="0 0 24 24" width="26" height="26">
+          <path d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </>
+  )
+}
+
+/** A gentle one-time hint for people who have never scrolled sideways before. */
+export function Hint() {
+  const [show, setShow] = useState(() => {
+    try {
+      return localStorage.getItem('planzer-hint') !== '1'
+    } catch {
+      return true
+    }
+  })
+  useEffect(() => {
+    if (!show) return
+    const done = () => {
+      setShow(false)
+      try {
+        localStorage.setItem('planzer-hint', '1')
+      } catch {
+        /* ignore */
+      }
+    }
+    const t = setTimeout(done, 9000)
+    const onMove = () => Math.abs(live.vel) > 400 && done()
+    const iv = setInterval(onMove, 250)
+    return () => {
+      clearTimeout(t)
+      clearInterval(iv)
+    }
+  }, [show])
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div className="hint-wrap" key="hint"><motion.div className="hint" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0, transition: { delay: 1.4 } }} exit={{ opacity: 0, y: 10 }}>
+          <span className="hint-hand" aria-hidden>
+            ⟷
+          </span>
+          Scroll, swipe or drag sideways — time keeps going.
+        </motion.div></motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+export function AddButton() {
+  const setSheet = useStore((s) => s.setSheet)
+  return (
+    <motion.button className="fab" onClick={() => setSheet({ type: 'add' })} initial={{ scale: 0, rotate: -90 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.8 }} aria-label="Add a goal or a plan">
+      <span>＋</span>
+      <b>Add</b>
+    </motion.button>
   )
 }

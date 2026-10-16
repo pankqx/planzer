@@ -55,31 +55,29 @@ export const useStore = create(
     (set, get) => ({
       ...initial,
 
-      // ——— UI (not persisted) ———
+      // ——— UI ———
+      theme: 'neon', // neon | paper  (persisted)
       phase: 'intro', // intro | app
-      view: 'year', // year | month | habits | print
-      month: now.m,
-      day: null,
-      focusGoal: null,
-      hoverMonth: null,
-      modal: null,
+      level: 'month', // year | month
+      focusAbs: now.y * 12 + now.m, // absolute month index the ribbon should show
+      focusDay: now.d,
+      jumpId: 0,
+      sheet: null, // { type: 'goal' | 'habits' | 'menu' | 'print' | 'goalView', ... }
+      setTheme: (theme) => set({ theme }),
       setPhase: (phase) => set({ phase }),
-      go: (view, extra = {}) => set({ view, day: null, ...extra }),
-      openMonth: (month) => set({ view: 'month', month, day: null }),
-      setDay: (day) => set({ day }),
-      setHoverMonth: (hoverMonth) => set({ hoverMonth }),
-      setFocusGoal: (focusGoal) => set((s) => ({ focusGoal: s.focusGoal === focusGoal ? null : focusGoal })),
-      setModal: (modal) => set({ modal }),
-      setYear: (year) => set({ year, focusGoal: null }),
+      setSheet: (sheet) => set({ sheet }),
+      setYear: (year) => set((s) => (s.year === year ? s : { year })),
+      // go to a level, optionally to a month (absolute index) and day
+      goTo: (level, abs, day = null) => set((s) => ({ level, focusAbs: abs ?? s.focusAbs, focusDay: day, jumpId: s.jumpId + 1 })),
 
       // ——— Goals ———
-      addGoal: ({ title, category, start, end, steps, why }) => {
-        const g = { id: uid(), year: get().year, title, category, start, end, why: why || '', milestones: breakdown(title, start, end, steps), created: Date.now() }
+      addGoal: ({ title, category, start, end, steps, why, year }) => {
+        const g = { id: uid(), year: year ?? get().year, title, category, start, end, why: why || '', milestones: breakdown(title, start, end, steps), created: Date.now() }
         set((s) => ({ goals: [...s.goals, g] }))
         return g.id
       },
       updateGoal: (id, patch) => set((s) => ({ goals: s.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)) })),
-      removeGoal: (id) => set((s) => ({ goals: s.goals.filter((g) => g.id !== id), tasks: s.tasks.map((t) => (t.goalId === id ? { ...t, goalId: null } : t)), focusGoal: null })),
+      removeGoal: (id) => set((s) => ({ goals: s.goals.filter((g) => g.id !== id), tasks: s.tasks.map((t) => (t.goalId === id ? { ...t, goalId: null } : t)) })),
       toggleMilestone: (gid, mid) =>
         set((s) => ({ goals: s.goals.map((g) => (g.id !== gid ? g : { ...g, milestones: g.milestones.map((m) => (m.id === mid ? { ...m, done: !m.done } : m)) })) })),
       addMilestone: (gid, month, title) =>
@@ -140,7 +138,7 @@ export const useStore = create(
     {
       name: 'planzer-v1',
       version: 1,
-      partialize: (s) => ({ year: s.year, goals: s.goals, tasks: s.tasks, notes: s.notes, habits: s.habits }),
+      partialize: (s) => ({ year: s.year, goals: s.goals, tasks: s.tasks, notes: s.notes, habits: s.habits, theme: s.theme }),
     },
   ),
 )
