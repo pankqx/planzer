@@ -2,7 +2,7 @@
 
 Planzer is an animated year and month planner. Time is laid out as one continuous **sideways ribbon**: you scroll, swipe or drag through months and days forever, and December runs straight into the next January.
 
-## Three worlds
+## Four worlds
 
 | | **Neon poster** (dark) | **Paper cut-out** (light) |
 |---|---|---|
@@ -12,7 +12,40 @@ Planzer is an animated year and month planner. Time is laid out as one continuou
 
 There is also a third world, **Solar**: the original celestial planner. The year is a 3D orrery with a living sun, and the twelve months are planets on a 365-day astrolabe dial. Goals become moons. There are glass panels in gold and midnight, plus a constellation logo intro, a habit orbit view and drag-to-spin.
 
-All three worlds share the same goals, plans and habits. Choose a world from the **Theme** button: the new one is revealed in a circle that grows from the button.
+There is also **Minimal**, in the spirit of walling.app and crypt.ee: white boards, hairlines, Instrument Serif type, and your own cover photo for every month.
+
+All four worlds share the same goals, plans and habits. Choose a world from the **Theme** button: the new one is revealed in a circle that grows from the button.
+
+## Landing page
+
+The landing page opens with a live **year field**: every day of the year is a tile, and the tiles swell toward your cursor. Tap any tile to open that day. Below it you'll find:
+
+- a countdown to New Year
+- a marquee of features
+- four tilting world portals (click one to enter that world)
+- feature boxes with small live demos
+
+## To-do, notes and reminders
+
+- **Tasks (Todoist-style).** Organised into Today, Upcoming, Inbox, Labels, Reminders, Completed and Search. Tasks support:
+  - priorities P1–P4
+  - @labels
+  - sub-tasks
+  - repeating tasks (daily, weekdays, weekly, monthly, yearly, every N)
+  - descriptions
+  - linking a task to a goal
+  - a daily goal with a streak
+
+  Overdue tasks can be moved to today in one go.
+- **Natural-language quick add.** Type `Call mom tomorrow 6pm p1 @family !30 every sunday #fitness` and Planzer fills in the date, time, priority, label, reminder, repeat and goal. Big buttons do the same job for anyone who'd rather tap.
+- **Reminders.** A soft chime, a pop-up card with Done and Snooze buttons, and browser notifications once you allow them. Reminders only fire while Planzer is open in a tab.
+- **Day notebook.** Tap a day (or press N) to open a full page for it:
+  - a rich editor with headings, bold, italic, underline, highlight, bullet and numbered lists, sub-lists, checklists, quotes, dividers and links
+  - photos, which you can add from a file, paste or drag in
+  - templates: Journal, Meeting, Checklist and Plan
+  - that day's tasks and habits alongside the notes
+
+  Notes and photos are kept in your browser's IndexedDB storage and are included in backups.
 
 ## How it works
 
@@ -37,7 +70,7 @@ npm run build   # static site in dist/
 
 ## Stack
 
-React 19 · Vite · Three.js / React Three Fiber (one shared canvas places 3D objects over the page) · hand-built SVG paper scenes · Framer Motion · GSAP · Zustand · View Transitions API
+React 19 · Vite · TipTap · IndexedDB (idb-keyval) · Three.js / React Three Fiber (one shared canvas places 3D objects over the page) · hand-built SVG paper scenes · Framer Motion · GSAP · Zustand · View Transitions API
 
 ```
 src/
@@ -47,4 +80,6 @@ src/
   intro/    NeonIntro, PaperIntro
   solar/    The Solar world: orrery, astrolabe dial, ledger, month & habit views
   ui/       Chrome (top bar, scrubber, arrows), Sheets, ThemePicker, Check, Logo
+  workspace/ TasksPanel, TaskDetail, QuickAdd, DayPage (TipTap notebook), reminders
+  landing/  The landing page
 ```

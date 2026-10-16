@@ -11,6 +11,7 @@ import YearLevel from './ribbon/YearLevel'
 import { TopBar, Scrubber, SideArrows, Hint, AddButton } from './ui/Chrome'
 import Sheets from './ui/Sheets'
 import Workspace from './workspace/Workspace'
+import Landing from './landing/Landing'
 
 const NeonStage = lazy(() => import('./neon/NeonStage'))
 const PrintView = lazy(() => import('./views/PrintView'))
@@ -45,6 +46,14 @@ export default function App() {
     addEventListener('keydown', onKey)
     return () => removeEventListener('keydown', onKey)
   }, [theme, phase, sheet, level, goTo])
+
+  if (phase === 'landing')
+    return (
+      <>
+        <Landing />
+        <div className="grain" aria-hidden />
+      </>
+    )
 
   if (theme === 'solar')
     return (
