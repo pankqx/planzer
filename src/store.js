@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { dateKey, daysIn, monthKey, todayParts, MONTHS } from './lib/date'
+import { nextOccurrence } from './lib/tasks'
+import { dumpBlobs, loadBlobs } from './lib/db'
 
 export const CATEGORIES = [
   { id: 'craft', name: 'Craft', color: '#e6c98a', glyph: '✦' },
@@ -48,7 +50,30 @@ const initial = {
   tasks: [],
   notes: {}, // monthKey -> { focus, reflection }
   habits: [],
+  noteIndex: {}, // dateKey -> { preview, images, words, updated } (the notebook itself lives in IndexedDB)
+  covers: {}, // monthKey -> true when a cover photo is stored
+  fired: {}, // reminderKey -> timestamp, so a reminder rings once
+  doneLog: {}, // dateKey -> number of tasks completed that day
+  prefs: { dailyGoal: 5 },
 }
+
+export const newTask = (f = {}) => ({
+  id: uid(),
+  title: '',
+  desc: '',
+  date: '',
+  time: '',
+  priority: 4,
+  labels: [],
+  goalId: null,
+  parentId: null,
+  recur: null,
+  remind: null,
+  done: false,
+  doneAt: null,
+  created: Date.now(),
+  ...f,
+})
 
 export const useStore = create(
   persist(
@@ -56,13 +81,22 @@ export const useStore = create(
       ...initial,
 
       // ——— UI ———
-      theme: 'neon', // neon | paper  (persisted)
-      phase: 'intro', // intro | app
+      theme: 'neon', // neon | paper | solar | minimal  (persisted)
+      phase: 'landing', // landing | intro | app
       level: 'month', // year | month
       focusAbs: now.y * 12 + now.m, // absolute month index the ribbon should show
       focusDay: now.d,
       jumpId: 0,
       sheet: null, // { type: 'goal' | 'habits' | 'menu' | 'print' | 'goalView', ... }
+      dayPage: null, // dateKey of the open day notebook
+      tasksView: null, // null (closed) | 'inbox' | 'today' | 'upcoming' | 'labels' | 'reminders' | 'done' | 'search'
+      taskOpen: null, // id of the task in the detail panel
+      toasts: [],
+      openDay: (dayPage) => set({ dayPage }),
+      openTasks: (tasksView) => set({ tasksView }),
+      openTask: (taskOpen) => set({ taskOpen }),
+      toast: (t) => set((s) => ({ toasts: [...s.toasts.filter((x) => x.id !== t.id), { id: uid(), ...t }] })),
+      dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((x) => x.id !== id) })),
       setTheme: (theme) => set({ theme }),
       setPhase: (phase) => set({ phase }),
       setSheet: (sheet) => set({ sheet }),
@@ -98,11 +132,60 @@ export const useStore = create(
       removeMilestone: (gid, mid) =>
         set((s) => ({ goals: s.goals.map((g) => (g.id !== gid ? g : { ...g, milestones: g.milestones.filter((m) => m.id !== mid) })) })),
 
-      // ——— Tasks / schedule ———
-      addTask: ({ date, time, title, goalId }) => set((s) => ({ tasks: [...s.tasks, { id: uid(), date, time: time || '', title, goalId: goalId || null, done: false }] })),
-      toggleTask: (id) => set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t)) })),
-      removeTask: (id) => set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) })),
+      // ——— Tasks (Todoist-style) ———
+      addTask: (f) => {
+        const t = newTask({ ...f, time: f.time || '', date: f.date || '', goalId: f.goalId || null, priority: f.priority || 4, labels: f.labels || [] })
+        set((s) => ({ tasks: [...s.tasks, t] }))
+        return t.id
+      },
+      updateTask: (id, patch) => set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)) })),
+      toggleTask: (id) =>
+        set((s) => {
+          const t = s.tasks.find((x) => x.id === id)
+          if (!t) return s
+          const today = todayParts().key
+          const log = { ...s.doneLog }
+          // a repeating task rolls forward instead of being finished
+          if (!t.done && t.recur) {
+            log[today] = (log[today] || 0) + 1
+            const date = nextOccurrence(t.date || today, t.recur)
+            return { doneLog: log, tasks: s.tasks.map((x) => (x.id === id ? { ...x, date, completions: (x.completions || 0) + 1, lastDone: today } : x.parentId === id ? { ...x, done: false } : x)) }
+          }
+          if (!t.done) log[today] = (log[today] || 0) + 1
+          else if (log[today]) log[today] -= 1
+          return { doneLog: log, tasks: s.tasks.map((x) => (x.id === id ? { ...x, done: !x.done, doneAt: x.done ? null : Date.now() } : x)) }
+        }),
+      removeTask: (id) => set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id && t.parentId !== id), taskOpen: s.taskOpen === id ? null : s.taskOpen })),
+      duplicateTask: (id) =>
+        set((s) => {
+          const t = s.tasks.find((x) => x.id === id)
+          if (!t) return s
+          const copy = newTask({ ...t, id: undefined, done: false, doneAt: null, created: Date.now() })
+          copy.id = uid()
+          const kids = s.tasks.filter((x) => x.parentId === id).map((k) => ({ ...k, id: uid(), parentId: copy.id, done: false }))
+          return { tasks: [...s.tasks, copy, ...kids] }
+        }),
       moveTask: (id, date) => set((s) => ({ tasks: s.tasks.map((t) => (t.id === id ? { ...t, date } : t)) })),
+      rescheduleOverdue: () => {
+        const today = todayParts().key
+        set((s) => ({ tasks: s.tasks.map((t) => (!t.done && t.date && t.date < today ? { ...t, date: today } : t)) }))
+      },
+      markFired: (key) => set((s) => ({ fired: { ...s.fired, [key]: Date.now() } })),
+      setPrefs: (patch) => set((s) => ({ prefs: { ...s.prefs, ...patch } })),
+      setNoteIndex: (key, info) =>
+        set((s) => {
+          const ni = { ...s.noteIndex }
+          if (info) ni[key] = info
+          else delete ni[key]
+          return { noteIndex: ni }
+        }),
+      setCover: (mk, has) =>
+        set((s) => {
+          const c = { ...s.covers }
+          if (has) c[mk] = Date.now()
+          else delete c[mk]
+          return { covers: c }
+        }),
 
       // ——— Month notes ———
       setNote: (mk, patch) => set((s) => ({ notes: { ...s.notes, [mk]: { ...(s.notes[mk] || {}), ...patch } } })),
@@ -122,13 +205,14 @@ export const useStore = create(
         })),
 
       // ——— Data ———
-      exportData: () => {
-        const { year, goals, tasks, notes, habits } = get()
-        return { app: 'planzer', version: 1, exported: new Date().toISOString(), year, goals, tasks, notes, habits }
+      exportData: async () => {
+        const { year, goals, tasks, notes, habits, noteIndex, covers, doneLog, prefs } = get()
+        return { app: 'planzer', version: 2, exported: new Date().toISOString(), year, goals, tasks, notes, habits, noteIndex, covers, doneLog, prefs, blobs: await dumpBlobs() }
       },
-      importData: (data) => {
+      importData: async (data) => {
         if (!data || data.app !== 'planzer') throw new Error('This file is not a Planzer backup.')
-        set({ goals: data.goals || [], tasks: data.tasks || [], notes: data.notes || {}, habits: data.habits || [], year: data.year || get().year })
+        await loadBlobs(data.blobs)
+        set({ goals: data.goals || [], tasks: (data.tasks || []).map((t) => newTask(t)), notes: data.notes || {}, habits: data.habits || [], year: data.year || get().year, noteIndex: data.noteIndex || {}, covers: data.covers || {}, doneLog: data.doneLog || {}, prefs: { ...get().prefs, ...(data.prefs || {}) } })
       },
       clearYear: () => {
         const y = get().year
@@ -142,7 +226,7 @@ export const useStore = create(
         const sample = sampleYear(y)
         set((s) => ({
           goals: [...s.goals.filter((g) => g.year !== y), ...sample.goals],
-          tasks: [...s.tasks.filter((t) => !t.date.startsWith(String(y))), ...sample.tasks],
+          tasks: [...s.tasks.filter((t) => !t.sample && !(t.date && t.date.startsWith(String(y)))), ...sample.tasks.map((t) => ({ ...t, sample: true }))],
           habits: s.habits.length ? s.habits : sample.habits,
           notes: { ...sample.notes, ...s.notes },
         }))
@@ -150,8 +234,12 @@ export const useStore = create(
     }),
     {
       name: 'planzer-v1',
-      version: 1,
-      partialize: (s) => ({ year: s.year, goals: s.goals, tasks: s.tasks, notes: s.notes, habits: s.habits, theme: s.theme }),
+      version: 2,
+      migrate: (state, from) => {
+        if (from < 2 && state) state.tasks = (state.tasks || []).map((t) => newTask(t))
+        return state
+      },
+      partialize: (s) => ({ year: s.year, goals: s.goals, tasks: s.tasks, notes: s.notes, habits: s.habits, theme: s.theme, noteIndex: s.noteIndex, covers: s.covers, fired: s.fired, doneLog: s.doneLog, prefs: s.prefs }),
     },
   ),
 )
@@ -165,7 +253,7 @@ export function monthStats(state, m) {
   const prefix = monthKey(y, m)
   const goals = state.goals.filter((g) => g.year === y && m >= g.start && m <= g.end)
   const milestones = goals.flatMap((g) => g.milestones.filter((ms) => ms.month === m).map((ms) => ({ ...ms, goal: g })))
-  const tasks = state.tasks.filter((t) => t.date.startsWith(prefix))
+  const tasks = state.tasks.filter((t) => !t.parentId && t.date && t.date.startsWith(prefix))
   const done = tasks.filter((t) => t.done).length
   const msDone = milestones.filter((x) => x.done).length
   const units = tasks.length + milestones.length
@@ -231,8 +319,28 @@ function sampleYear(y) {
       const date = dateKey(y, m, d)
       const past = y < t.y || (y === t.y && (m < t.m || (m === t.m && d < t.d)))
       const g = goals[Math.floor(Math.random() * goals.length)]
-      tasks.push({ id: uid(), date, time: times[i % times.length], title: titles[(i + m) % titles.length], goalId: m >= g.start && m <= g.end ? g.id : null, done: past && Math.random() > 0.2 })
+      tasks.push(newTask({ date, time: times[i % times.length], title: titles[(i + m) % titles.length], goalId: m >= g.start && m <= g.end ? g.id : null, done: past && Math.random() > 0.2, priority: [1, 2, 3, 4, 4, 4][(i + m) % 6], labels: [['focus'], ['health'], [], ['work'], [], ['home']][(i + m) % 6] }))
     }
+  }
+  // a few Todoist-style extras around today
+  const tk = t.key
+  const plus = (n) => {
+    const dt = new Date(t.y, t.m, t.d + n)
+    return dateKey(dt.getFullYear(), dt.getMonth(), dt.getDate())
+  }
+  if (y === t.y) {
+    const big = newTask({ title: 'Plan the weekend trip', date: plus(1), time: '19:00', priority: 2, labels: ['travel'], desc: 'Check trains and book a homestay.' })
+    tasks.push(
+      big,
+      newTask({ title: 'Book train tickets', parentId: big.id, date: plus(1) }),
+      newTask({ title: 'Pack the camera', parentId: big.id, date: plus(1) }),
+      newTask({ title: 'Morning run', date: tk, time: '06:30', recur: { freq: 'day', every: 1 }, labels: ['health'], priority: 3 }),
+      newTask({ title: 'Pay electricity bill', date: tk, time: '18:00', priority: 1, remind: 30, labels: ['home'] }),
+      newTask({ title: 'Weekly review', date: plus(3), recur: { freq: 'week', every: 1 }, labels: ['focus'] }),
+      newTask({ title: 'Submit assignment', date: plus(-1), priority: 1, labels: ['college'] }),
+      newTask({ title: 'Buy a new notebook', labels: ['shopping'] }),
+      newTask({ title: 'Ideas for the blog', desc: 'Photo story of the monsoon trip', labels: ['writing'] }),
+    )
   }
   const habit = (name, color, rate) => {
     const log = {}
