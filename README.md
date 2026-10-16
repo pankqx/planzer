@@ -1,46 +1,47 @@
-# ✦ Planzer — your year, charted among the stars
+# ∞ Planzer — your whole year on one endless line
 
-Planzer is a celestial year and month planner. Your year is a 3D **orrery**: the sun is the year, and each of the twelve months is a world on its own orbit. Your goals become moons that circle the months they live in. Planzer splits each goal into a monthly path for you, and it keeps your daily habits in orbit too.
+Planzer is an animated year and month planner. Time is laid out as one continuous **sideways ribbon**: you scroll, swipe or drag through months and days forever, and December runs straight into the next January.
 
-## The experience
+## Two worlds
 
-- **Opening ritual.** A seed of light appears and a spiral of 3,200 particles converges into the Planzer astrolabe. Gold hairlines draw the mark, then a glint sweeps across it. The name rises out of blur. When you choose *Enter*, the constellation bursts into the sky and the orrery ignites.
-- **Year: the orrery.** A shader-lit sun sits at the center, with 12 banded planets in seasonal palettes. A 365-tick astrolabe dial marks today with a light-bead hand, and a flowing path traces the year. Drag to spin the heavens and touch a world to fly into its month. The *Ledger of Intentions* lists every goal with its progress and its 12-month path, and focusing a goal lights up its months in 3D.
-- **Goal composer.** Pick a category and the months the goal spans, then list some steps. Planzer previews the monthly path live before you place the goal in the sky.
-- **Month.** The camera flies to that month's planet. The month view includes:
-  - a written briefing of the month's plan
-  - stats for completion, plans, milestones, habit rhythm and days remaining
-  - a luminous calendar with a day sheet for scheduling timed plans, and drag-to-reschedule
-  - a milestone checklist for each goal
-  - a reflection journal
-- **Habits.** Each habit is a ring and each day of the month is a bead on it. You also get streaks, best runs, and a center that reports how many habits you kept today.
-- **Print studio.** It produces a cover, a year at a glance, an intentions page, and a full page for each month with a calendar, milestones, a habit tracker and note lines. It comes in Ivory or Midnight. Click **Print / Save PDF** to get an A4 planner, which works for paper, GoodNotes or a digital-product download.
-- **Details:**
-  - a custom cursor and magnetic buttons
-  - film grain and bloom
-  - adaptive resolution on slower GPUs
-  - support for reduced motion
-  - keyboard controls: `Enter` to begin, `Esc` to return to the year, `←` / `→` to move between months
+| | **Neon poster** (dark) | **Paper cut-out** (light) |
+|---|---|---|
+| Look | Matte black, one electric colour per month, giant outline type | Warm card stock, washi tape, sticker buttons, hand-written numbers |
+| Month art | A spinning 3D neon sculpture for each month: snowflake, heart, bloom, ice cream, sun, umbrella, rain cloud, kite, leaf, diya, star lantern, gift | A layered pop-up paper scene for each month: snow hills, blossoms, Holi fields, mango grove, summer coast, monsoon, rain garden, kites, harvest pookalam, festival diyas, star lanterns, winter night |
+| Opening | The twelve sculptures circle while the sign flickers on, letter by letter, like a gas tube | Card hills spring up, the sun rises, a kite crosses the sky, and the letters drop in as coloured tiles |
 
-## Data
+You switch worlds with a circular reveal from the sun or moon button.
 
-Everything is saved locally in your browser, so it works offline with no login. The ⋮ menu lets you export or import a JSON backup, load a sample year, or clear a year. The store (`src/store.js`) is a single Zustand slice, ready to have cloud sync added later.
+## How it works
+
+- **Month:** each month opens with a poster: its name fills with colour as you complete plans, followed by a short summary, big numbers, your focus for the month and its milestones. After the poster comes one card per day, where you can add plans, tick them off, and tap habit buttons.
+- **Year:** months appear as cards, and each goal is drawn as a coloured ribbon running under the months it covers. Tap a card to zoom into that month.
+- **Getting around:**
+  - big ◀ ▶ arrows
+  - the month strip at the bottom
+  - the **Today** button
+  - keyboard: ← →, Shift + ← → for whole months, T for today, Y / M to switch views
+- **One ＋ Add button:** add a goal (Planzer splits it into monthly steps), a plan for a day, or a daily habit.
+- **Print studio:** produces an A4 PDF planner.
+- **Your data:** everything is saved on your device. You can back it up to a file and open it again later.
 
 ## Run it
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
-npm run build    # static site in dist/ (relative paths, works on GitHub Pages)
+npm run dev
+npm run build   # static site in dist/
 ```
 
 ## Stack
 
-React 19 · Vite · Three.js with React Three Fiber, drei and postprocessing · custom GLSL shaders (simplex/fbm noise) · GSAP · Framer Motion · Zustand
+React 19 · Vite · Three.js / React Three Fiber (one shared canvas places 3D objects over the page) · hand-built SVG paper scenes · Framer Motion · GSAP · Zustand · View Transitions API
 
 ```
 src/
-  three/   Cosmos (camera director), Sky (stars, nebula, meteors), LogoMark, Orrery
-  views/   YearView, MonthView, HabitsView, PrintView
-  ui/      Intro, Chrome (header, dock, menu), GoalModal, Cursor, Magnetic, Mark, bits
+  ribbon/   Ribbon (infinite virtualised scroller), layouts, Month/Year levels
+  neon/     NeonStage (3D canvas), objects (12 procedural sculptures)
+  paper/    PaperScene (12 layered cut-paper scenes)
+  intro/    NeonIntro, PaperIntro
+  ui/       Chrome (top bar, scrubber, arrows), Sheets, Check, Logo
 ```

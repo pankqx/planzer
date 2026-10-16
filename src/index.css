@@ -422,7 +422,8 @@ textarea.field { resize: vertical; line-height: 1.5; }
 .tape { display: none; }
 [data-theme='paper'] .tape { display: block; position: absolute; z-index: 4; top: -12px; left: 50%; width: 92px; height: 26px; margin-left: -46px; transform: rotate(-3deg); background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--mc, var(--accent)) 55%, transparent) 0 7px, color-mix(in srgb, var(--mc, var(--accent)) 35%, transparent) 7px 14px); opacity: 0.85; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08); mask: linear-gradient(90deg, transparent 0 3px, #000 3px calc(100% - 3px), transparent calc(100% - 3px)); }
 
-[data-theme='paper'] .poster-art { margin: 26px 34px 30px 10px; }
+[data-theme='paper'] .poster-art { margin: 20px 34px 24px 10px; display: flex; align-items: center; }
+[data-theme='paper'] .poster-art > .art-paper { position: relative; inset: auto; width: 100%; aspect-ratio: 6 / 5; max-height: 100%; }
 [data-theme='paper'] .art-paper { border-radius: 22px; overflow: hidden; background: var(--sky, #eee); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.05), 10px 12px 0 -2px rgba(43, 33, 24, 0.12), 0 30px 60px -30px rgba(43, 33, 24, 0.55); border: 6px solid #fffdf8; transform: rotate(0.8deg); }
 [data-theme='paper'] .art-cap { left: 18px; right: auto; bottom: 14px; background: #fffdf8; color: var(--ink); padding: 6px 12px; border-radius: 10px; letter-spacing: 0.04em; text-transform: none; font-family: var(--hand); font-size: 22px; font-weight: 700; box-shadow: 2px 2px 0 var(--ink); border: 2px solid var(--ink); transform: rotate(-3deg); }
 [data-theme='paper'] .mname { font-weight: 900; font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144; letter-spacing: -0.035em; }
@@ -562,11 +563,15 @@ textarea.field { resize: vertical; line-height: 1.5; }
   :root { --top: 66px; --bottom: 80px; }
   .topbar { padding: 0 12px; gap: 6px; }
   .logo-word, .tb-right .lbl { display: none; }
-  .switch button { min-width: 72px; height: 40px; font-size: 14px; }
+  .switch button { min-width: 58px; height: 38px; font-size: 13px; }
+  .switch { padding: 3px; }
+  .tb-right { gap: 6px; }
+  .fab { width: 58px; height: 58px; padding: 0; justify-content: center; border-radius: 50% !important; }
+  .fab b { display: none; }
   .btn.today { padding: 0 12px; min-height: 42px; }
-  .btn.icon { min-height: 42px; padding: 0 10px; }
+  .btn.icon { min-height: 42px; padding: 0 9px; }
   .scrub { height: 54px; gap: 2px; padding: 0 4px; }
-  .scrub-year { width: 46px; font-size: 15px; }
+  .scrub-year { width: 54px; font-size: 14px; }
   .scrub-y { width: 30px; }
   .scrub-m .full { display: none; }
   .scrub-m .short { display: inline; }
@@ -574,7 +579,9 @@ textarea.field { resize: vertical; line-height: 1.5; }
   .poster-art { grid-row: 1; }
   .poster-text { grid-row: 2; justify-content: flex-start; overflow-y: auto; padding: 14px 18px 24px; gap: 12px; transform: none; opacity: 1; }
   [data-theme='paper'] .poster-art { margin: 10px 14px 4px; }
-  .mname { font-size: min(17cqw, 72px) !important; }
+  [data-theme='paper'] .poster-art > .art-paper { aspect-ratio: auto; height: 100%; }
+  [data-theme='paper'] .mname { font-size: min(17cqw, 72px); }
+  [data-theme='neon'] .mname { font-size: min(11.4cqw, 54px); }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .art-num { font-size: 30vh; }
   .ycard { height: min(58%, 420px); }

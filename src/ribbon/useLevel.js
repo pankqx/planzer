@@ -73,7 +73,7 @@ export function useLevel(kind) {
 
   useEffect(() => {
     nav.ribbon = {
-      goToMonth: (abs, day) => ribbon.current?.scrollTo(targetX(abs, day)),
+      goToMonth: (abs, day, instant) => ribbon.current?.scrollTo(targetX(abs, day), { instant }),
       step: (dir) => {
         const Lx = LRef.current
         const mid = ribbon.current.X + Lx.vw / 2

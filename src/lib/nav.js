@@ -18,3 +18,5 @@ export const useSlots = create((set) => ({
   slots: {},
   setSlots: (owner, list) => set((s) => ({ slots: { ...s.slots, [owner]: list } })),
 }))
+
+if (typeof window !== 'undefined' && location.search.includes('debug')) Object.assign(window, { __nav: nav, __live: live })
