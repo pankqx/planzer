@@ -8,6 +8,7 @@ import { absOf, mod12, yearOf } from '../lib/theme'
 import Logo from './Logo'
 import ThemePicker from './ThemePicker'
 import { TasksButton } from '../workspace/Workspace'
+import { CalendarButton } from '../calendar/Calendar'
 
 export function TopBar() {
   const level = useStore((s) => s.level)
@@ -34,6 +35,7 @@ export function TopBar() {
         <button className="btn today" onClick={() => goTo('month', absOf(t.y, t.m), t.d)}>
           <span className="tdot" /> Today
         </button>
+        <CalendarButton />
         <TasksButton />
         <ThemePicker />
         <button className="btn icon" onClick={() => setSheet({ type: 'menu' })} aria-label="Menu">

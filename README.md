@@ -47,6 +47,10 @@ The landing page opens with a live **year field**: every day of the year is a ti
 
   Notes and photos are kept in your browser's IndexedDB storage and are included in backups.
 
+## Calendar (same in every theme)
+
+A plain white calendar opens from the **Calendar** button or the C key, and scrolls vertically forever. It has two modes, **Month** grids and **Agenda** list, and a day panel with that day's tasks, goal steps, habits, and a link to its notebook. By default each day shows just its date; the **Show** checklist adds tasks, goals, notes & photos, and habits.
+
 ## How it works
 
 - **Month:** each month opens with a poster: its name fills with colour as you complete plans, followed by a short summary, big numbers, your focus for the month and its milestones. After the poster comes one card per day, where you can add plans, tick them off, and tap habit buttons.
@@ -82,4 +86,5 @@ src/
   ui/       Chrome (top bar, scrubber, arrows), Sheets, ThemePicker, Check, Logo
   workspace/ TasksPanel, TaskDetail, QuickAdd, DayPage (TipTap notebook), reminders
   landing/  The landing page
+  calendar/ The theme-free vertical calendar
 ```

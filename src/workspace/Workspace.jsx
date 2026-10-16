@@ -3,6 +3,7 @@ import { useStore } from '../store'
 import TasksPanel from './TasksPanel'
 import TaskDetail, { Toasts } from './TaskDetail'
 import DayPage from './DayPage'
+import Calendar from '../calendar/Calendar'
 import { useReminderEngine } from './reminders'
 import { todayKey } from '../lib/tasks'
 
@@ -18,6 +19,10 @@ export default function Workspace() {
         e.preventDefault()
         s.openTasks(s.tasksView || 'today')
       }
+      if (e.key === 'c' && !e.metaKey && !e.ctrlKey && !s.dayPage) {
+        e.preventDefault()
+        s.openCal(!s.calOpen)
+      }
       if (e.key === 'n' && !e.metaKey && !e.ctrlKey && !s.dayPage) {
         e.preventDefault()
         s.openDay(todayKey())
@@ -28,6 +33,7 @@ export default function Workspace() {
   }, [])
   return (
     <>
+      <Calendar />
       <DayPage />
       <TasksPanel />
       <TaskDetail />

@@ -54,7 +54,7 @@ const initial = {
   covers: {}, // monthKey -> true when a cover photo is stored
   fired: {}, // reminderKey -> timestamp, so a reminder rings once
   doneLog: {}, // dateKey -> number of tasks completed that day
-  prefs: { dailyGoal: 5 },
+  prefs: { dailyGoal: 5, calShow: { tasks: false, goals: false, notes: false, habits: false }, calMode: 'month' },
 }
 
 export const newTask = (f = {}) => ({
@@ -92,6 +92,9 @@ export const useStore = create(
       tasksView: null, // null (closed) | 'inbox' | 'today' | 'upcoming' | 'labels' | 'reminders' | 'done' | 'search'
       taskOpen: null, // id of the task in the detail panel
       toasts: [],
+      calOpen: false,
+      calDay: null,
+      openCal: (calOpen, calDay = null) => set((s) => ({ calOpen, calDay: calDay ?? s.calDay })),
       openDay: (dayPage) => set({ dayPage }),
       openTasks: (tasksView) => set({ tasksView }),
       openTask: (taskOpen) => set({ taskOpen }),

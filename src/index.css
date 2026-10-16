@@ -601,7 +601,10 @@ textarea.field { resize: vertical; line-height: 1.5; }
   .tb-right { gap: 6px; }
   .fab { width: 58px; height: 58px; padding: 0; justify-content: center; border-radius: 50% !important; }
   .fab b { display: none; }
-  .btn.today { padding: 0 12px; min-height: 42px; }
+  .btn.today { padding: 0 11px; min-height: 42px; font-size: 0; gap: 0; }
+  .btn.today .tdot { width: 11px; height: 11px; }
+  .tb-right { gap: 4px !important; }
+  .tb-right .btn.icon { padding: 0 8px; }
   .btn.icon { min-height: 42px; padding: 0 9px; }
   .scrub { height: 54px; gap: 2px; padding: 0 4px; }
   .scrub-year { width: 54px; font-size: 14px; }
@@ -768,3 +771,5 @@ textarea.field { resize: vertical; line-height: 1.5; }
 [data-theme='minimal'] .gv-ico { border-radius: 12px; }
 [data-theme='minimal'] .tp-pop { background: #fff; border: 1px solid var(--hair); border-radius: 16px; box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.3); color: #111; }
 [data-theme='minimal'] .tp-opt.on, [data-theme='minimal'] .tp-opt:hover { background: #f4f4f3; }
+
+@media (max-width: 430px) { .topbar .logo { display: none; } }
