@@ -25,7 +25,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'paper' ? '#f4ede0' : theme === 'solar' ? '#03040a' : '#050506')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'paper' ? '#f4ede0' : theme === 'solar' ? '#03040a' : theme === 'minimal' ? '#f4f4f3' : '#050506')
   }, [theme])
 
   useEffect(() => {

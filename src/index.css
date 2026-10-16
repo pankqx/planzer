@@ -3,6 +3,8 @@
 @import '@fontsource-variable/fraunces/full.css';
 @import '@fontsource-variable/nunito';
 @import '@fontsource-variable/caveat';
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-serif/400-italic.css';
 
 /* ———————————————————— tokens ———————————————————— */
 :root {
@@ -50,6 +52,26 @@
   --gold: var(--accent);
   --gold-hi: var(--ink);
   --serif: 'Fraunces Variable', Georgia, serif;
+  --sans: var(--body);
+}
+
+[data-theme='minimal'] {
+  color-scheme: light;
+  --bg: #f4f4f3;
+  --ink: #111111;
+  --muted: #737373;
+  --soft: #a3a3a3;
+  --hair: #e6e6e4;
+  --card: #ffffff;
+  --display: 'Instrument Serif', Georgia, serif;
+  --body: 'Inter Variable', system-ui, sans-serif;
+  --hand: 'Instrument Serif', Georgia, serif;
+  --line: var(--hair);
+  --mute: var(--muted);
+  --faint: var(--soft);
+  --gold: #111;
+  --gold-hi: #111;
+  --serif: 'Instrument Serif', Georgia, serif;
   --sans: var(--body);
 }
 
@@ -636,3 +658,113 @@ textarea.field { resize: vertical; line-height: 1.5; }
 [data-theme='solar'] .tp-opt { cursor: none; }
 [data-theme='solar'] .tp-opt b { font-family: var(--serif); font-weight: 400; font-size: 19px; }
 [data-theme='solar'] .tp-opt.on, [data-theme='solar'] .tp-opt:hover { background: rgba(230, 201, 138, 0.08); }
+
+/* =====================================================================
+   MINIMAL — white boards, hairlines, Instrument Serif, your own photos
+   (in the spirit of walling.app and crypt.ee)
+   ===================================================================== */
+[data-theme='minimal'] body { background: #f4f4f3; letter-spacing: -0.005em; }
+[data-theme='minimal'] .grain { display: none; }
+[data-theme='minimal'] .btn { border-radius: 10px; border: 1px solid var(--hair); background: #fff; font-weight: 600; font-size: 15px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); }
+[data-theme='minimal'] .btn:hover { border-color: #cfcfcd; background: #fafafa; }
+[data-theme='minimal'] .btn.primary { background: #111; color: #fff; border-color: #111; }
+[data-theme='minimal'] .btn.primary:hover { background: #2a2a2a; }
+[data-theme='minimal'] .btn.ghost { background: none; border-color: transparent; box-shadow: none; color: var(--muted); }
+[data-theme='minimal'] .badge { background: #111; color: #fff; border-radius: 999px; font-size: 11px; letter-spacing: 0.04em; }
+[data-theme='minimal'] .logo-mark .lm-tube { stroke: transparent; }
+[data-theme='minimal'] .logo-mark .lm-core { stroke: #111; stroke-width: 4.5; }
+[data-theme='minimal'] .logo-mark .lm-dot { fill: var(--accent); }
+[data-theme='minimal'] .logo-word { font-family: 'Inter Variable', sans-serif; font-weight: 650; font-size: 20px; letter-spacing: -0.03em; }
+[data-theme='minimal'] .switch { background: #e9e9e7; border-radius: 12px; padding: 4px; }
+[data-theme='minimal'] .switch button { color: var(--muted); font-weight: 600; font-size: 15px; height: 38px; }
+[data-theme='minimal'] .switch button.on { color: #111; }
+[data-theme='minimal'] .switch .sw-pill { background: #fff; border-radius: 9px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+[data-theme='minimal'] .check { border: 1.5px solid #c4c4c4; border-radius: 50%; width: 26px; height: 26px; }
+[data-theme='minimal'] .check svg { stroke: #fff; width: 16px; height: 16px; }
+[data-theme='minimal'] .check.on { background: #111; border-color: #111; }
+[data-theme='minimal'] .hbtn { border-width: 1.5px; width: 34px; height: 34px; font-size: 13px; }
+[data-theme='minimal'] .hbtn.on { color: #fff; }
+[data-theme='minimal'] .scrub { background: #fff; border: 1px solid var(--hair); border-radius: 14px; box-shadow: 0 8px 30px -12px rgba(0, 0, 0, 0.15); }
+[data-theme='minimal'] .scrub-year { font-family: 'Inter Variable', sans-serif; font-weight: 650; font-size: 16px; }
+[data-theme='minimal'] .scrub-m { font-weight: 500; font-size: 14px; }
+[data-theme='minimal'] .scrub-ind::before { content: ''; position: absolute; inset: 6px 4px; border-radius: 8px; background: #f0f0ee; }
+[data-theme='minimal'] .scrub-ind::after { content: ''; position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
+[data-theme='minimal'] .side-arrow { background: #fff; border: 1px solid var(--hair); border-radius: 50%; box-shadow: 0 4px 16px -8px rgba(0, 0, 0, 0.2); width: 50px; height: 50px; margin-top: -25px; }
+[data-theme='minimal'] .fab { background: #111; color: #fff; border-radius: 16px; font-weight: 650; box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.45); }
+[data-theme='minimal'] .hint { background: #111; color: #fff; border-radius: 999px; font-weight: 500; }
+
+[data-theme='minimal'] .poster-text { gap: 16px; }
+[data-theme='minimal'] .kicker { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 15px; }
+[data-theme='minimal'] .kicker b { font-weight: 650; }
+[data-theme='minimal'] .now-tag { background: #111; color: #fff; border-radius: 999px; font-size: 12px; letter-spacing: 0; }
+[data-theme='minimal'] .mname { font-weight: 400; letter-spacing: -0.02em; font-size: min(19cqw, 18vh, 190px); }
+[data-theme='minimal'] .mn-base { color: #d6d6d3; }
+[data-theme='minimal'] .mn-fill { color: #111; }
+[data-theme='minimal'] .lead { color: var(--muted); font-size: 17px; }
+[data-theme='minimal'] .stats { gap: 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+[data-theme='minimal'] .stat { padding: 14px 12px 14px 0; }
+[data-theme='minimal'] .stat + .stat { border-left: 1px solid var(--hair); padding-left: 16px; }
+[data-theme='minimal'] .stat b { font-family: 'Inter Variable', sans-serif; font-weight: 600; letter-spacing: -0.03em; }
+[data-theme='minimal'] .stat span { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 13.5px; }
+[data-theme='minimal'] .intent span { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 14px; color: var(--ink); }
+[data-theme='minimal'] .intent input { background: #fff; border: 1px solid var(--hair); border-radius: 10px; }
+[data-theme='minimal'] .intent input:focus { border-color: #111; }
+[data-theme='minimal'] .poster-art { margin: 22px 30px 22px 6px; }
+.art-min { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; background: #fff; border: 1px solid var(--hair); display: grid; place-items: center; background-image: radial-gradient(#e2e2df 1px, transparent 1px); background-size: 22px 22px; }
+.art-min.has { background: #ddd; }
+.art-min img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(calc(1.06 + var(--d, 0) * var(--d, 0) * 0.2)) translateX(calc(var(--d, 0) * -40px)); transition: transform 0.2s linear; }
+.min-num { font-family: 'Instrument Serif', serif; font-size: min(46vh, 30vw); line-height: 1; color: #111; letter-spacing: -0.04em; transform: translateX(calc(var(--d, 0) * 60px)); }
+.min-actions { position: absolute; left: 16px; bottom: 16px; display: flex; gap: 6px; }
+.art-min.has .min-actions .btn.ghost { background: rgba(255, 255, 255, 0.85); color: #111; }
+
+[data-theme='minimal'] .day-in { background: #fff; border: 1px solid var(--hair); border-radius: 16px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); transform: translateY(calc(var(--d, 0) * var(--d, 0) * 26px)) skewX(calc(var(--v, 0) * -3deg)); }
+[data-theme='minimal'] .day.past .day-in { background: #fafaf9; }
+[data-theme='minimal'] .day.past .dn { color: var(--soft); }
+[data-theme='minimal'] .day .wd { text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 14px; color: var(--muted); }
+[data-theme='minimal'] .day.weekend .wd { color: var(--mc); }
+[data-theme='minimal'] .day .dn { font-family: 'Inter Variable', sans-serif; font-weight: 600; font-size: 54px; letter-spacing: -0.05em; justify-self: start; }
+[data-theme='minimal'] .day.today .dn { color: #fff; background: #111; border-radius: 18px; padding: 2px 14px 6px; }
+[data-theme='minimal'] .day.today .day-in { border-color: #111; box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.35); }
+[data-theme='minimal'] .day .mo { text-transform: none; font-weight: 500; }
+[data-theme='minimal'] .plans li { font-weight: 500; font-size: 15.5px; }
+[data-theme='minimal'] .add-plan { border: 1px dashed #d4d4d2; border-radius: 10px; color: var(--muted); font-weight: 600; font-size: 14.5px; }
+[data-theme='minimal'] .add-plan:hover { border-color: #111; color: #111; }
+[data-theme='minimal'] .plan-form input { background: #fff; border: 1px solid var(--hair); border-radius: 10px; }
+[data-theme='minimal'] .habits-row { border-top: 1px solid var(--hair); }
+[data-theme='minimal'] .note-peek { background: #f6f6f5; color: #3f3f3f; }
+
+[data-theme='minimal'] .ycard { background: #fff; border: 1px solid var(--hair); border-radius: 18px; padding: 8px 8px 0; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); transform: translateY(calc(var(--d, 0) * var(--d, 0) * 24px)); }
+[data-theme='minimal'] .ycard:hover { box-shadow: 0 20px 40px -24px rgba(0, 0, 0, 0.35); border-color: #d4d4d2; }
+[data-theme='minimal'] .ycard.now { border-color: #111; }
+[data-theme='minimal'] .ycard-art { border-radius: 12px; }
+[data-theme='minimal'] .ycard-art .art-min { border-radius: 12px; border: 0; }
+[data-theme='minimal'] .ycard-art .min-num { font-size: min(18vh, 120px); }
+[data-theme='minimal'] .ycard-name { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; }
+[data-theme='minimal'] .ycard-bar { background: #efefed; border-radius: 4px; height: 5px; }
+[data-theme='minimal'] .ycard-bar i { background: #111; }
+[data-theme='minimal'] .ymini i.busy { background: #111; color: #fff; }
+[data-theme='minimal'] .ymark-num { font-family: 'Instrument Serif', serif; font-weight: 400; letter-spacing: -0.03em; font-size: min(22vh, 12vw, 190px); }
+[data-theme='minimal'] .ymark-meta { text-transform: none; letter-spacing: 0; font-weight: 500; }
+[data-theme='minimal'] .lane { background: #fff; border: 1px solid var(--hair); border-left: 0; border-right: 0; }
+[data-theme='minimal'] .lane.first { border-left: 1px solid var(--hair); border-radius: 10px 0 0 10px; box-shadow: inset 4px 0 0 var(--c); }
+[data-theme='minimal'] .lane.last { border-right: 1px solid var(--hair); border-radius: 0 10px 10px 0; }
+[data-theme='minimal'] .lane.first.last { border-radius: 10px; }
+[data-theme='minimal'] .lane.done { background: color-mix(in srgb, var(--c) 14%, #fff); }
+[data-theme='minimal'] .lane-title { color: #111; font-weight: 600; font-size: 14px; }
+[data-theme='minimal'] .lane-dot { background: var(--c); }
+
+[data-theme='minimal'] .veil { background: rgba(244, 244, 243, 0.7); backdrop-filter: blur(6px); }
+[data-theme='minimal'] .sheet { background: #fff; border: 1px solid var(--hair); border-radius: 20px; box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.3); }
+[data-theme='minimal'] .sheet-h { font-weight: 400; font-size: clamp(28px, 3.4vw, 36px); }
+[data-theme='minimal'] .field { background: #fff; border: 1px solid var(--hair); border-radius: 10px; }
+[data-theme='minimal'] .field:focus { border-color: #111; }
+[data-theme='minimal'] .chip, [data-theme='minimal'] .months12 button { background: #fff; border: 1px solid var(--hair); border-radius: 10px; font-weight: 600; }
+[data-theme='minimal'] .chip.on, [data-theme='minimal'] .months12 button.edge { background: #111; color: #fff; border-color: #111; }
+[data-theme='minimal'] .months12 button.in { background: #efefed; }
+[data-theme='minimal'] .path { background: #fafaf9; border-radius: 12px; border: 1px solid var(--hair); }
+[data-theme='minimal'] .choice, [data-theme='minimal'] .menu-item, [data-theme='minimal'] .hab-list li { background: #fff; border: 1px solid var(--hair); border-radius: 14px; }
+[data-theme='minimal'] .choice:hover, [data-theme='minimal'] .menu-item:hover { border-color: #111; }
+[data-theme='minimal'] .ch-ico, [data-theme='minimal'] .mi-ico { background: #f2f2f0; color: #111; border-radius: 12px; }
+[data-theme='minimal'] .gv-ico { border-radius: 12px; }
+[data-theme='minimal'] .tp-pop { background: #fff; border: 1px solid var(--hair); border-radius: 16px; box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.3); color: #111; }
+[data-theme='minimal'] .tp-opt.on, [data-theme='minimal'] .tp-opt:hover { background: #f4f4f3; }

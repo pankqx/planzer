@@ -7,6 +7,7 @@ export const THEMES = [
   { id: 'neon', name: 'Neon', note: 'Dark · bright 3D objects' },
   { id: 'paper', name: 'Paper', note: 'Light · cut-paper scenes' },
   { id: 'solar', name: 'Solar', note: 'Space · planets & gold' },
+  { id: 'minimal', name: 'Minimal', note: 'Quiet · white, photos & focus' },
 ]
 
 function Preview({ id }) {
@@ -27,6 +28,18 @@ function Preview({ id }) {
         <circle cx="46" cy="14" r="6" fill="#f6a63a" />
         <rect x="10" y="8" width="8" height="8" rx="2" fill="#e8574a" transform="rotate(-6 14 12)" />
         <rect x="20" y="9" width="8" height="8" rx="2" fill="#2f7d4f" transform="rotate(5 24 13)" />
+      </svg>
+    )
+  if (id === 'minimal')
+    return (
+      <svg viewBox="0 0 64 40" className="tp-prev">
+        <rect width="64" height="40" rx="6" fill="#f4f4f3" />
+        <rect x="6" y="7" width="22" height="26" rx="3" fill="#fff" stroke="#e5e5e5" />
+        <rect x="31" y="7" width="12" height="26" rx="3" fill="#fff" stroke="#e5e5e5" />
+        <rect x="46" y="7" width="12" height="26" rx="3" fill="#fff" stroke="#e5e5e5" />
+        <text x="9" y="22" fontSize="10" fontFamily="Georgia" fontStyle="italic" fill="#111">Oct</text>
+        <circle cx="37" cy="12" r="2.5" fill="#111" />
+        <path d="M34 19h6M34 23h5M49 19h6M49 23h4" stroke="#c4c4c4" />
       </svg>
     )
   return (

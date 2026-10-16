@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { live, nav, useSlots } from '../lib/nav'
-import { NEON, PAPER, mix, monthOf, yearOf } from '../lib/theme'
+import { NEON, PAPER, mix, monthOf, yearOf, monthColor } from '../lib/theme'
 import { daysIn } from '../lib/date'
 import { yearLayout, monthLayout } from './layouts'
 
@@ -109,14 +109,14 @@ export function useLevel(kind) {
       const t = clamp01(1 - (p0 + w - mid) / zone)
       const e = t * t * (3 - 2 * t)
       const neon = themeRef.current === 'neon'
-      const col = (j) => (neon ? NEON[monthOf(j)] : PAPER[monthOf(j)].accent)
+      const col = (j) => monthColor(themeRef.current, monthOf(j))
       const accent = mix(col(k), col(k + 1), e)
       if (accent !== lastAccent.current) {
         lastAccent.current = accent
         live.accent = accent
         const root = document.documentElement.style
         root.setProperty('--accent', accent)
-        if (!neon) root.setProperty('--tint', mix(PAPER[monthOf(k)].sky, PAPER[monthOf(k + 1)].sky, e))
+        if (themeRef.current === 'paper') root.setProperty('--tint', mix(PAPER[monthOf(k)].sky, PAPER[monthOf(k + 1)].sky, e))
       }
       const y = yearOf(k)
       if (y !== lastYear.current) {

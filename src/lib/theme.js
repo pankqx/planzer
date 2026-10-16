@@ -49,4 +49,7 @@ export const yearOf = (abs) => Math.floor(abs / 12)
 export const monthOf = (abs) => mod12(abs)
 export const absOf = (y, m) => y * 12 + m
 
-export const monthColor = (theme, m) => (theme === 'neon' ? NEON[mod12(m)] : PAPER[mod12(m)].accent)
+// MINIMAL — quiet, slightly dusty inks, only ever used as small accents.
+export const MINIMAL = ['#5b7c99', '#b56576', '#6a994e', '#c9a227', '#e07a5f', '#3d8b8b', '#4a6fa5', '#d1495b', '#8d6a9f', '#c46d2b', '#7b6d8d', '#4f6d7a']
+
+export const monthColor = (theme, m) => (theme === 'neon' ? NEON[mod12(m)] : theme === 'minimal' ? MINIMAL[mod12(m)] : PAPER[mod12(m)].accent)
