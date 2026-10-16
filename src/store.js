@@ -319,7 +319,7 @@ function sampleYear(y) {
       const date = dateKey(y, m, d)
       const past = y < t.y || (y === t.y && (m < t.m || (m === t.m && d < t.d)))
       const g = goals[Math.floor(Math.random() * goals.length)]
-      tasks.push(newTask({ date, time: times[i % times.length], title: titles[(i + m) % titles.length], goalId: m >= g.start && m <= g.end ? g.id : null, done: past && Math.random() > 0.2, priority: [1, 2, 3, 4, 4, 4][(i + m) % 6], labels: [['focus'], ['health'], [], ['work'], [], ['home']][(i + m) % 6] }))
+      tasks.push(newTask({ date, time: times[i % times.length], title: titles[(i + m) % titles.length], goalId: m >= g.start && m <= g.end ? g.id : null, done: past, priority: [1, 2, 3, 4, 4, 4][(i + m) % 6], labels: [['focus'], ['health'], [], ['work'], [], ['home']][(i + m) % 6] }))
     }
   }
   // a few Todoist-style extras around today
@@ -358,3 +358,5 @@ function sampleYear(y) {
   const notes = { [monthKey(y, t.m)]: { focus: `Make ${MONTHS[t.m]} the month the habits stick.` } }
   return { goals, tasks, habits, notes }
 }
+
+if (typeof window !== 'undefined' && location.search.includes('debug')) window.__store = useStore

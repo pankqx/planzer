@@ -10,6 +10,7 @@ import MonthLevel from './ribbon/MonthLevel'
 import YearLevel from './ribbon/YearLevel'
 import { TopBar, Scrubber, SideArrows, Hint, AddButton } from './ui/Chrome'
 import Sheets from './ui/Sheets'
+import Workspace from './workspace/Workspace'
 
 const NeonStage = lazy(() => import('./neon/NeonStage'))
 const PrintView = lazy(() => import('./views/PrintView'))
@@ -56,6 +57,7 @@ export default function App() {
             <PrintView />
           </Suspense>
         )}
+        {phase === 'app' && <Workspace />}
         <div className="grain" aria-hidden />
       </>
     )
@@ -78,6 +80,7 @@ export default function App() {
           <AddButton />
           <Hint />
           <Sheets />
+          <Workspace />
         </main>
       )}
       {sheet?.type === 'print' && (

@@ -320,7 +320,10 @@ function DaySheet() {
         <AnimatePresence mode="wait">
           <motion.div key={day} initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, y: -6, filter: 'blur(6px)' }} transition={{ duration: 0.45, ease }}>
             <div className="eyebrow">{wd}</div>
-            <div style={{ fontFamily: 'var(--display)', fontSize: 30, margin: '4px 0 14px', letterSpacing: '.04em' }}>{rest}</div>
+            <div style={{ fontFamily: 'var(--display)', fontSize: 30, margin: '4px 0 10px', letterSpacing: '.04em' }}>{rest}</div>
+            <button className="btn small" style={{ marginBottom: 14 }} onClick={() => useStore.getState().openDay(day)}>
+              ✎ Open day page — notes, photos & tasks
+            </button>
             {list.length === 0 && <p style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', color: 'var(--faint)', fontSize: 16, marginBottom: 10 }}>A clear day. What will you place in it?</p>}
             <div style={{ position: 'relative' }}>
               {list.length > 0 && <span style={{ position: 'absolute', left: 10, top: 10, bottom: 10, width: 1, background: 'linear-gradient(var(--line-2), transparent)' }} />}

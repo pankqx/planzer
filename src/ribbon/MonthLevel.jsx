@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import Ribbon from './Ribbon'
 import MonthArt from './MonthArt'
@@ -9,6 +9,8 @@ import { monthOf, yearOf, monthColor } from '../lib/theme'
 import { statsFor, plainSummary } from '../lib/plan'
 import { nav } from '../lib/nav'
 import Check from '../ui/Check'
+import { prio, fmtTime } from '../lib/tasks'
+import { getNote } from '../lib/db'
 
 const WD = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -137,7 +139,10 @@ function DayCard({ y, m, d, left, w, c }) {
   const toggleTask = useStore((s) => s.toggleTask)
   const removeTask = useStore((s) => s.removeTask)
   const toggleHabit = useStore((s) => s.toggleHabit)
-  const list = useMemo(() => tasks.filter((x) => x.date === key).sort((a, b) => (a.time || '99').localeCompare(b.time || '99')), [tasks, key])
+  const openDay = useStore((s) => s.openDay)
+  const openTask = useStore((s) => s.openTask)
+  const note = useStore((s) => s.noteIndex[key])
+  const list = useMemo(() => tasks.filter((x) => x.date === key && !x.parentId).sort((a, b) => a.done - b.done || (a.time || '99').localeCompare(b.time || '99') || a.priority - b.priority), [tasks, key])
   const t = todayParts()
   const today = key === t.key
   const date = new Date(y, m, d)
@@ -149,27 +154,25 @@ function DayCard({ y, m, d, left, w, c }) {
     <article className={cls} data-c={c} style={{ left, width: w }}>
       <div className="day-in">
         <span className="tape" aria-hidden />
-        <header className="day-head">
+        <button className="day-head" onClick={() => openDay(key)} aria-label={`Open the page for ${WD[wd]} ${d} ${MONTHS[m]}`}>
           <span className="wd">{WD[wd]}</span>
           <span className="dn">{d}</span>
           {today ? <span className="badge">Today</span> : <span className="mo">{MONTHS[m].slice(0, 3)}</span>}
-        </header>
+          <span className="open-page">Open page ↗</span>
+        </button>
+        {note && <NotePreview dateKey={key} note={note} onOpen={() => openDay(key)} />}
         <ul className="plans" data-vscroll>
           {list.length === 0 && <li className="empty">{today ? 'Nothing planned yet.' : past ? '—' : 'Free day'}</li>}
           {list.map((x) => {
             const g = goals.find((gg) => gg.id === x.goalId)
+            const pc = x.priority < 4 ? prio(x.priority).color : g ? catOf(g.category).color : undefined
+            const meta = [x.time && fmtTime(x.time), x.recur && '↻', x.remind != null && '🔔', ...(x.labels || []).map((l) => `@${l}`), g?.title].filter(Boolean)
             return (
-              <li key={x.id} className={x.done ? 'done' : ''}>
-                <Check checked={x.done} onChange={() => toggleTask(x.id)} label={x.title} color={g ? catOf(g.category).color : undefined} />
-                <span className="pt">
+              <li key={x.id} className={`${x.done ? 'done' : ''} ${x.priority < 4 ? `p${x.priority}` : ''}`}>
+                <Check checked={x.done} onChange={() => toggleTask(x.id)} label={x.title} color={pc} />
+                <span className="pt" onClick={() => openTask(x.id)} role="button" tabIndex={0}>
                   {x.title}
-                  {(x.time || g) && (
-                    <small>
-                      {x.time}
-                      {x.time && g ? ' · ' : ''}
-                      {g?.title}
-                    </small>
-                  )}
+                  {meta.length > 0 && <small>{meta.join(' · ')}</small>}
                 </span>
                 <button className="x" onClick={() => removeTask(x.id)} aria-label={`Delete ${x.title}`}>
                   ×
@@ -227,5 +230,44 @@ function AddPlan({ date }) {
         </button>
       </div>
     </form>
+  )
+}
+
+const thumbCache = new Map()
+/** A peek at the day's notebook: first words and the first photo. */
+function NotePreview({ dateKey, note, onOpen }) {
+  const [img, setImg] = useState(() => thumbCache.get(`${dateKey}:${note.updated}`) || null)
+  useEffect(() => {
+    if (!note.images) return setImg(null)
+    const ck = `${dateKey}:${note.updated}`
+    if (thumbCache.has(ck)) return setImg(thumbCache.get(ck))
+    let alive = true
+    getNote(dateKey).then((doc) => {
+      let src = null
+      const walk = (n) => {
+        if (src || !n) return
+        if (n.type === 'image') src = n.attrs?.src
+        n.content?.forEach(walk)
+      }
+      walk(doc)
+      thumbCache.set(ck, src)
+      if (alive) setImg(src)
+    })
+    return () => {
+      alive = false
+    }
+  }, [dateKey, note.updated, note.images])
+  return (
+    <button className="note-peek" onClick={onOpen}>
+      {img && <img src={img} alt="" />}
+      <span>
+        {note.preview || 'Photo note'}
+        {note.todos > 0 && (
+          <em>
+            ☑ {note.doneTodos}/{note.todos}
+          </em>
+        )}
+      </span>
+    </button>
   )
 }

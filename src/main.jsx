@@ -1,6 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import '@fontsource-variable/inter'
 import './index.css'
+import './workspace/workspace.css'
 import gsap from 'gsap'
 import App from './App.jsx'
 

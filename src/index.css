@@ -163,7 +163,18 @@ svg { display: block; }
 /* ———————————————————— month level: day cards ———————————————————— */
 .day { position: absolute; top: 0; bottom: 0; }
 .day-in { position: absolute; inset: 14px 9px; display: flex; flex-direction: column; padding: 18px 18px 16px; transform: translateY(calc(var(--d, 0) * var(--d, 0) * 70px)) rotate(calc(var(--d, 0) * 4deg + var(--tilt, 0deg))) skewX(calc(var(--v, 0) * -7deg)); transition: box-shadow 0.4s, border-color 0.4s; }
-.day-head { display: grid; grid-template-columns: 1fr auto; align-items: end; row-gap: 0; margin-bottom: 10px; }
+.day-head { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: end; row-gap: 0; margin-bottom: 10px; text-align: left; width: 100%; border-radius: 8px; }
+.day-head .open-page { position: absolute; right: 0; top: 0; font-size: 12.5px; font-weight: 800; opacity: 0; transform: translateY(-4px); transition: all 0.25s var(--ease); color: var(--mc, var(--accent)); }
+.day-head:hover .open-page, .day-head:focus-visible .open-page { opacity: 1; transform: none; }
+.note-peek { display: flex; gap: 10px; align-items: flex-start; text-align: left; margin: -2px 0 10px; padding: 8px; border-radius: 10px; font-size: 13.5px; line-height: 1.35; color: var(--muted); background: color-mix(in srgb, var(--mc, var(--accent)) 8%, transparent); }
+.note-peek img { width: 54px; height: 54px; object-fit: cover; border-radius: 8px; flex: none; }
+.note-peek span { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.note-peek em { font-style: normal; font-weight: 800; margin-left: 6px; color: var(--ink); }
+.plans li .pt { cursor: pointer; }
+.tasks-btn { position: relative; }
+.tasks-badge { position: absolute; top: -7px; right: -7px; min-width: 21px; height: 21px; padding: 0 5px; border-radius: 11px; background: #e44332; color: #fff; font-size: 11.5px; font-weight: 800; display: grid; place-items: center; letter-spacing: 0; }
+[data-theme='solar'] .solar-tasks { position: relative; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--gold); background: linear-gradient(160deg, rgba(20, 24, 52, 0.74), rgba(7, 9, 22, 0.7)); border: 1px solid var(--line-2); }
+[data-theme='solar'] .solar-tasks .lbl { display: none; }
 .day-head .wd { grid-column: 1 / -1; font-weight: 800; font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .day-head .dn { font-family: var(--display); font-size: 68px; line-height: 0.95; font-weight: 800; }
 .day-head .mo { font-weight: 700; color: var(--soft); font-size: 15px; text-transform: uppercase; margin-bottom: 8px; }

@@ -4,6 +4,7 @@ import { useStore } from '../../store'
 import { MONTHS, todayParts, toRoman } from '../../lib/date'
 import Mark from './Mark'
 import ThemePicker from '../../ui/ThemePicker'
+import { TasksButton } from '../../workspace/Workspace'
 import Magnetic from './Magnetic'
 import { sig } from '../three/signals'
 
@@ -64,6 +65,7 @@ export function Header() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long' })}, {t.d} {MONTHS[t.m]}
           </b>
         </div>
+        <TasksButton className="solar-tasks" />
         <ThemePicker />
         <Menu />
       </div>
