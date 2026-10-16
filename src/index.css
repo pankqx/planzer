@@ -194,11 +194,11 @@ svg { display: block; }
 .ycard-body { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 8px; }
 .ycard-top { display: flex; align-items: center; justify-content: space-between; }
 .ycard-name { font-family: var(--display); font-size: 25px; font-weight: 800; letter-spacing: -0.02em; }
-.mini { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 11px; font-weight: 700; }
-.mini b { font-size: 10px; color: var(--soft); }
-.mini i { font-style: normal; line-height: 17px; border-radius: 50%; color: var(--muted); }
-.mini i.busy { color: var(--bg); background: var(--mc); }
-.mini i.td { outline: 2px solid var(--mc); outline-offset: -1px; color: var(--ink); }
+.ymini { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 11px; font-weight: 700; }
+.ymini b { font-size: 10px; color: var(--soft); }
+.ymini i { font-style: normal; line-height: 17px; border-radius: 50%; color: var(--muted); }
+.ymini i.busy { color: var(--bg); background: var(--mc); }
+.ymini i.td { outline: 2px solid var(--mc); outline-offset: -1px; color: var(--ink); }
 .ycard-bar { height: 8px; overflow: hidden; }
 .ycard-bar i { display: block; height: 100%; background: var(--mc); transition: width 1s var(--ease); }
 .ycard-meta { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--muted); }
@@ -600,3 +600,28 @@ textarea.field { resize: vertical; line-height: 1.5; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.15s !important; }
   .day-in, .ycard, .poster-text, .poster-art, .pscene .pl { transform: none !important; }
 }
+
+/* ———————————————————— theme picker (shared by all three worlds) ———————————————————— */
+.tpick { position: relative; }
+.tp-btn svg { fill: none; stroke: currentColor; stroke-width: 2; }
+.tp-btn .tp-half { fill: currentColor; stroke: none; }
+.tp-pop { position: absolute; right: 0; top: calc(100% + 10px); z-index: 70; width: 290px; padding: 10px; display: flex; flex-direction: column; gap: 6px; transform-origin: top right; }
+.tp-h { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 6px 6px; opacity: 0.7; }
+.tp-opt { display: flex; align-items: center; gap: 12px; padding: 8px; text-align: left; border-radius: 12px; transition: background 0.2s, transform 0.2s; }
+.tp-opt:hover { transform: translateX(3px); }
+.tp-opt b { display: block; font-size: 16px; }
+.tp-opt small { display: block; font-size: 13px; opacity: 0.7; }
+.tp-opt i { margin-left: auto; font-style: normal; font-weight: 900; }
+.tp-prev { width: 64px; height: 40px; flex: none; border-radius: 6px; box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.35); }
+[data-theme='neon'] .tp-pop { background: #0b0b0e; border: 2px solid var(--accent); box-shadow: 0 0 50px -16px var(--accent); color: var(--ink); }
+[data-theme='neon'] .tp-opt.on, [data-theme='neon'] .tp-opt:hover { background: rgba(255, 255, 255, 0.06); }
+[data-theme='paper'] .tp-pop { background: #fffdf8; border: 2.5px solid var(--ink); border-radius: 16px; box-shadow: 5px 5px 0 var(--ink); color: var(--ink); }
+[data-theme='paper'] .tp-opt.on, [data-theme='paper'] .tp-opt:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+[data-theme='solar'] .tpick { display: flex; }
+[data-theme='solar'] .tp-btn { width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 50%; color: var(--gold); background: linear-gradient(160deg, rgba(20, 24, 52, 0.74), rgba(7, 9, 22, 0.7)); border: 1px solid var(--line-2); }
+[data-theme='solar'] .tp-btn .lbl { display: none; }
+[data-theme='solar'] .tp-pop { top: 54px; background: #0d1128; border: 1px solid var(--line-2); border-radius: 18px; color: var(--ivory); box-shadow: 0 30px 80px -30px #000; font-family: var(--sans); }
+[data-theme='solar'] .tp-h { color: var(--gold); font-weight: 500; letter-spacing: 0.3em; font-size: 10px; }
+[data-theme='solar'] .tp-opt { cursor: none; }
+[data-theme='solar'] .tp-opt b { font-family: var(--serif); font-weight: 400; font-size: 19px; }
+[data-theme='solar'] .tp-opt.on, [data-theme='solar'] .tp-opt:hover { background: rgba(230, 201, 138, 0.08); }

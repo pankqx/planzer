@@ -66,7 +66,20 @@ export const useStore = create(
       setTheme: (theme) => set({ theme }),
       setPhase: (phase) => set({ phase }),
       setSheet: (sheet) => set({ sheet }),
-      setYear: (year) => set((s) => (s.year === year ? s : { year })),
+      setYear: (year) => set((s) => (s.year === year ? s : { year, focusGoal: null })),
+      // Solar world UI
+      view: 'year', // year | month | habits | print
+      month: now.m,
+      day: null,
+      focusGoal: null,
+      hoverMonth: null,
+      modal: null,
+      go: (view, extra = {}) => set({ view, day: null, ...extra }),
+      openMonth: (month) => set({ view: 'month', month, day: null }),
+      setDay: (day) => set({ day }),
+      setHoverMonth: (hoverMonth) => set({ hoverMonth }),
+      setFocusGoal: (focusGoal) => set((s) => ({ focusGoal: s.focusGoal === focusGoal ? null : focusGoal })),
+      setModal: (modal) => set({ modal }),
       // go to a level, optionally to a month (absolute index) and day
       goTo: (level, abs, day = null) => set((s) => ({ level, focusAbs: abs ?? s.focusAbs, focusDay: day, jumpId: s.jumpId + 1 })),
 
@@ -77,7 +90,7 @@ export const useStore = create(
         return g.id
       },
       updateGoal: (id, patch) => set((s) => ({ goals: s.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)) })),
-      removeGoal: (id) => set((s) => ({ goals: s.goals.filter((g) => g.id !== id), tasks: s.tasks.map((t) => (t.goalId === id ? { ...t, goalId: null } : t)) })),
+      removeGoal: (id) => set((s) => ({ goals: s.goals.filter((g) => g.id !== id), tasks: s.tasks.map((t) => (t.goalId === id ? { ...t, goalId: null } : t)), focusGoal: null })),
       toggleMilestone: (gid, mid) =>
         set((s) => ({ goals: s.goals.map((g) => (g.id !== gid ? g : { ...g, milestones: g.milestones.map((m) => (m.id === mid ? { ...m, done: !m.done } : m)) })) })),
       addMilestone: (gid, month, title) =>

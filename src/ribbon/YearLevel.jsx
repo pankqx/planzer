@@ -87,7 +87,7 @@ function YearCard({ abs, y, m, c }) {
           <span className="ycard-name">{MONTHS[m]}</span>
           {now && <span className="badge">Now</span>}
         </div>
-        <div className="mini">
+        <div className="ymini">
           {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((w, i) => (
             <b key={i}>{w}</b>
           ))}

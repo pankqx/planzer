@@ -2,7 +2,7 @@
 
 Planzer is an animated year and month planner. Time is laid out as one continuous **sideways ribbon**: you scroll, swipe or drag through months and days forever, and December runs straight into the next January.
 
-## Two worlds
+## Three worlds
 
 | | **Neon poster** (dark) | **Paper cut-out** (light) |
 |---|---|---|
@@ -10,7 +10,9 @@ Planzer is an animated year and month planner. Time is laid out as one continuou
 | Month art | A spinning 3D neon sculpture for each month: snowflake, heart, bloom, ice cream, sun, umbrella, rain cloud, kite, leaf, diya, star lantern, gift | A layered pop-up paper scene for each month: snow hills, blossoms, Holi fields, mango grove, summer coast, monsoon, rain garden, kites, harvest pookalam, festival diyas, star lanterns, winter night |
 | Opening | The twelve sculptures circle while the sign flickers on, letter by letter, like a gas tube | Card hills spring up, the sun rises, a kite crosses the sky, and the letters drop in as coloured tiles |
 
-You switch worlds with a circular reveal from the sun or moon button.
+There is also a third world, **Solar**: the original celestial planner. The year is a 3D orrery with a living sun, and the twelve months are planets on a 365-day astrolabe dial. Goals become moons. There are glass panels in gold and midnight, plus a constellation logo intro, a habit orbit view and drag-to-spin.
+
+All three worlds share the same goals, plans and habits. Choose a world from the **Theme** button: the new one is revealed in a circle that grows from the button.
 
 ## How it works
 
@@ -43,5 +45,6 @@ src/
   neon/     NeonStage (3D canvas), objects (12 procedural sculptures)
   paper/    PaperScene (12 layered cut-paper scenes)
   intro/    NeonIntro, PaperIntro
-  ui/       Chrome (top bar, scrubber, arrows), Sheets, Check, Logo
+  solar/    The Solar world: orrery, astrolabe dial, ledger, month & habit views
+  ui/       Chrome (top bar, scrubber, arrows), Sheets, ThemePicker, Check, Logo
 ```

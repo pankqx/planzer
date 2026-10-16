@@ -13,6 +13,7 @@ import Sheets from './ui/Sheets'
 
 const NeonStage = lazy(() => import('./neon/NeonStage'))
 const PrintView = lazy(() => import('./views/PrintView'))
+const SolarApp = lazy(() => import('./solar/SolarApp'))
 
 export default function App() {
   const theme = useStore((s) => s.theme)
@@ -23,12 +24,12 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'neon' ? '#050506' : '#f4ede0')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'paper' ? '#f4ede0' : theme === 'solar' ? '#03040a' : '#050506')
   }, [theme])
 
   useEffect(() => {
     const onKey = (e) => {
-      if (phase !== 'app' || sheet || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return
+      if (theme === 'solar' || phase !== 'app' || sheet || /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName)) return
       const r = nav.ribbon
       if (e.key === 'ArrowRight') (e.shiftKey ? r?.stepMonth(1) : r?.step(1), e.preventDefault())
       if (e.key === 'ArrowLeft') (e.shiftKey ? r?.stepMonth(-1) : r?.step(-1), e.preventDefault())
@@ -42,7 +43,22 @@ export default function App() {
     }
     addEventListener('keydown', onKey)
     return () => removeEventListener('keydown', onKey)
-  }, [phase, sheet, level, goTo])
+  }, [theme, phase, sheet, level, goTo])
+
+  if (theme === 'solar')
+    return (
+      <>
+        <Suspense fallback={null}>
+          <SolarApp />
+        </Suspense>
+        {sheet?.type === 'print' && (
+          <Suspense fallback={null}>
+            <PrintView />
+          </Suspense>
+        )}
+        <div className="grain" aria-hidden />
+      </>
+    )
 
   return (
     <>

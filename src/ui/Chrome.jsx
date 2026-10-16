@@ -6,6 +6,7 @@ import { live, nav } from '../lib/nav'
 import { MONTHS, todayParts } from '../lib/date'
 import { absOf, mod12, yearOf } from '../lib/theme'
 import Logo from './Logo'
+import ThemePicker from './ThemePicker'
 
 export function TopBar() {
   const level = useStore((s) => s.level)
@@ -32,7 +33,7 @@ export function TopBar() {
         <button className="btn today" onClick={() => goTo('month', absOf(t.y, t.m), t.d)}>
           <span className="tdot" /> Today
         </button>
-        <ThemeToggle />
+        <ThemePicker />
         <button className="btn icon" onClick={() => setSheet({ type: 'menu' })} aria-label="Menu">
           <svg viewBox="0 0 24 24" width="20" height="20">
             <path d="M4 7h16M4 12h16M4 17h16" />
